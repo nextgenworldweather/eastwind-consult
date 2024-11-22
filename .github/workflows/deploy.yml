@@ -43,7 +43,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: github-pages  # The name of the uploaded artifact
-          path: './dist'      # Ensure this path is correct (should match Vite's output directory)
+          path: './dist/public'  # Correct path where build output is located
 
   deploy:
     needs: build
