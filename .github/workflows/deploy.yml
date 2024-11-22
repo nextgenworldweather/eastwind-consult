@@ -37,7 +37,9 @@ jobs:
 
       # Build the project
       - name: Build
-        run: npm run build
+        run: |
+          rm -rf dist/*
+          npm run build
 
       # Debug: List files in the `dist` folder
       - name: Verify dist folder
