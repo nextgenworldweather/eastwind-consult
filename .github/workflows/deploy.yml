@@ -42,8 +42,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: github-pages  # Ensure the artifact name matches here
-          path: './dist'      # Path to the build output directory (matches `outDir` in vite.config.js)
+          name: github-pages  # The name of the uploaded artifact
+          path: './dist'      # Ensure this path is correct (should match Vite's output directory)
 
   deploy:
     needs: build
@@ -62,5 +62,5 @@ jobs:
         uses: actions/deploy-pages@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifact_name: github-pages  # This should match the artifact name uploaded in the build job
+          artifact_name: github-pages  # This must match the artifact name uploaded in the build job
           preview: false
