@@ -36,14 +36,14 @@ jobs:
           rm -rf dist
           npm run build
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+      - name: List files in dist folder
+        run: ls -la ./dist
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: github-pages  # The name of the uploaded artifact
-          path: './dist/public'  # Correct path where build output is located
+          path: './dist/public'  # Update this path if needed
 
   deploy:
     needs: build
@@ -62,5 +62,5 @@ jobs:
         uses: actions/deploy-pages@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifact_name: github-pages  # This must match the artifact name uploaded in the build job
+          artifact_name: github-pages  # This should match the artifact name from the upload step
           preview: false
