@@ -23,19 +23,33 @@ jobs:
       # Install all dependencies
       - name: Install Dependencies
         run: |
+          rm -rf node_modules
           npm ci
           npm install
           npm install firebase peerjs react react-dom uuid
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom
-          npm install -D gh-pages tailwindcss postcss autoprefixer @tailwindcss/forms
+          npm install -D gh-pages tailwindcss autoprefixer postcss
       
       # Configuration files (just to confirm)
-      - name: Create configuration files
+      - name: Generate postcss.config.js
+        run: echo "module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } };" > postcss.config.js
+
+      - name: Generate tailwind.config.js
         run: |
-          echo "module.exports = { plugins: [require('tailwindcss'), require('autoprefixer')] };" > postcss.config.js
-          echo '{"extends": ["@tailwindcss/forms"]}' > tailwind.config.js
-          cat postcss.config.js
-          cat tailwind.config.js
+          echo "module.exports = {" > tailwind.config.js
+          echo "  content: [" >> tailwind.config.js
+          echo "    './src/**/*.{js,jsx,ts,tsx}'," >> tailwind.config.js
+          echo "    './index.html'," >> tailwind.config.js
+          echo "  ]," >> tailwind.config.js
+          echo "  theme: {" >> tailwind.config.js
+          echo "    extend: {}," >> tailwind.config.js
+          echo "  }," >> tailwind.config.js
+          echo "  plugins: [" >> tailwind.config.js
+          echo "    require('@tailwindcss/forms')({" >> tailwind.config.js
+          echo "      strategy: 'class'," >> tailwind.config.js
+          echo "    })," >> tailwind.config.js
+          echo "  ]," >> tailwind.config.js
+          echo "};" >> tailwind.config.js
       
       # Build the project
       - name: Build
