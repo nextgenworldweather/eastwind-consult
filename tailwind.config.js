@@ -80,7 +80,6 @@ module.exports = {
       strategy: 'class',
     }),
   ],
-  // Safelist commonly used classes to prevent purging
   safelist: [
     'bg-primary-blue',
     'bg-primary-green',
