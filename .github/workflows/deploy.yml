@@ -8,20 +8,26 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 22
+          cache: 'npm'
 
       # Step 3: Cache Node.js dependencies
       - name: Cache Node.js dependencies
@@ -32,27 +38,53 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-modules-
 
+
       # Step 4: Install dependencies
       - name: Install dependencies
-        run: npm install
+        run: |
+          npm ci
+          npm install firebase
+          npm install --save-dev gh-pages
+          npm install @vitejs/plugin-react vite @types/react @types/react-dom --save-dev
+          npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
 
       # Step 5: Build the app
       - name: Build the app
-        run: npm run build
+        run: |
+          rm -rf dist
+          npm run build
+          ls -la ./dist
 
-      # Step 6: Upload the build artifact
+      # Step 6: Verify successful build
+      - name: List files in dist folder
+        run: ls -la ./dist
+
+      # Step 7: Upload the build artifact
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: github-pages
-          path: dist  # Path to the built output folder
+          name: github-pages  # The name of the uploaded artifact
+          path: dist  # Update this path if needed
 
-      # Step 7: Deploy to GitHub Pages
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Step 8: Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v3
         with:
-          artifact_name: github-pages  # The name of the uploaded artifact
           token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: github-pages 
 
       # Step 8: Clean up
       - name: Clean up
