@@ -23,7 +23,6 @@ jobs:
       # Install all dependencies
       - name: Install Dependencies
         run: |
-          rm -rf node_modules
           npm ci
           npm install
           npm install firebase peerjs react react-dom uuid
@@ -32,7 +31,13 @@ jobs:
       
       # Configuration files (just to confirm)
       - name: Generate postcss.config.js
-        run: echo "module.exports = { plugins: { tailwindcss: {}, autoprefixer: {} } };" > postcss.config.js
+        run: |
+          echo "module.exports = {" > postcss.config.js
+          echo "  plugins: {" >> postcss.config.js
+          echo "    tailwindcss: {}," >> postcss.config.js
+          echo "    autoprefixer: {}," >> postcss.config.js
+          echo "  }" >> postcss.config.js
+          echo "};" >> postcss.config.js
 
       - name: Generate tailwind.config.js
         run: |
