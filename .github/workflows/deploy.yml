@@ -3,8 +3,6 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 permissions:
   contents: read
@@ -14,13 +12,20 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # Checkout the code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Node.js
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
 
+      # Install dependencies
       - name: Install dependencies
         run: |
           npm ci
@@ -29,9 +34,15 @@ jobs:
           npm install @vitejs/plugin-react vite @types/react @types/react-dom
           npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
 
-      - name: Build project
+      # Build the project
+      - name: Build
         run: npm run build
 
+      # Debug: List files in the `dist` folder
+      - name: Verify dist folder
+        run: ls -la ./dist
+
+      # Upload the build output as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -41,10 +52,14 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      # Download the artifact uploaded during the build step
+      - name: Download artifact
+        uses: actions/download-artifact@v4
         with:
           name: github-pages
-          path: dist
-      - uses: actions/deploy-pages@v4
+
+          # Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v3
