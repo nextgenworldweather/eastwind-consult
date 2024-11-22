@@ -23,7 +23,6 @@ jobs:
       # Install all dependencies
       - name: Install Dependencies
         run: |
-          rm -rf node_modules
           npm ci
           npm install
           npm install firebase peerjs react react-dom uuid
