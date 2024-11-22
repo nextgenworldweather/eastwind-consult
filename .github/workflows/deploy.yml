@@ -38,12 +38,13 @@ jobs:
           name: github-pages
           path: dist
 
-      - name : Deploy
-        needs: build
-        steps:
-          - uses: actions/checkout@v4
-          - uses: actions/download-artifact@v4
-            with:
-              name: github-pages
-              path: dist
-          - uses: actions/deploy-pages@v4
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: dist
+      - uses: actions/deploy-pages@v4
