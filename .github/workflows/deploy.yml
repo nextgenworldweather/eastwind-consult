@@ -34,6 +34,8 @@ jobs:
         run: |
           echo "module.exports = { plugins: [require('tailwindcss'), require('autoprefixer')] };" > postcss.config.js
           echo '{"extends": ["@tailwindcss/forms"]}' > tailwind.config.js
+          cat postcss.config.js
+          cat tailwind.config.js
       
       # Build the project
       - name: Build
