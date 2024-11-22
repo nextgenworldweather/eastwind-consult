@@ -32,7 +32,9 @@ jobs:
          npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
 
       - name: Build
-        run: npm run build
+        run: |
+          rm -rf dist
+          npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
