@@ -2,52 +2,65 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main  # Trigger on push to the 'main' branch
+    branches: [main]
 
 permissions:
-  contents: read  # Allows reading repo contents
-  pages: write    # Allows pushing to GitHub Pages
-  id-token: write # Allows issuing OIDC token for deployment
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
-      - name: Checkout repository
+      # Checkout the code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      # Step 2: Set up Node.js environment
-      - name: Setup Node.js
+      # Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '16'  # Use a specific Node.js version compatible with your project
-          cache: npm  # Enable caching of npm dependencies for faster builds
+          node-version: 22
+          cache: npm
 
-      # Step 3: Install dependencies
+      # Install dependencies
       - name: Install dependencies
         run: |
-          npm ci  # Clean install based on package-lock.json
-          npm install --save-dev gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss vite @vitejs/plugin-react
+          npm ci
+          npm install
+          npm install firebase
+          npm install --save-dev gh-pages
+          npm install @vitejs/plugin-react vite @types/react @types/react-dom
+          npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
 
-      # Step 4: Build the project using Vite
-      - name: Build the project
-        run: npm run build
+      # Build the project
+      - name: Build
+        run: |
+          rm -rf dist/*
+          npm run build
 
-      # Step 5: Debug: List files in the dist folder
+      # Debug: List files in the `dist` folder
       - name: Verify dist folder
         run: |
           pwd
           ls -la ./dist
 
-      # Step 6: Deploy to GitHub Pages (direct deployment from dist)
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      # Upload the build output as an artifact
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          branch: gh-pages  # The branch to deploy to
-          folder: dist      # The folder to deploy (output of Vite build)
-          token: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the secret PAT token
-          clean: true
-          force: true
+          name: github-pages
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: dist
+      - uses: actions/deploy-pages@v4
