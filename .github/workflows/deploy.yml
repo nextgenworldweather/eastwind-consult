@@ -42,10 +42,9 @@ jobs:
           pwd
           ls -la ./dist
 
-      # Step 6: Deploy to GitHub Pages
+      # Step 6: Deploy to GitHub Pages (direct deployment from dist)
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          branch: gh-pages  # Deploy the built output to gh-pages branch
-          folder: dist      # The folder to deploy is 'dist' (from Vite build)
-
+          branch: gh-pages  # The branch to deploy to
+          folder: dist      # The folder to deploy (output of Vite build)
