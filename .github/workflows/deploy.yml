@@ -24,7 +24,8 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: |
+         npm ci
          npm install firebase
          npm install --save-dev gh-pages
          npm install @vitejs/plugin-react vite @types/react @types/react-dom --save-dev
