@@ -2,21 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --primary-red: #ff4444;
-  --primary-yellow: #ffbb33;
-  --primary-blue: #3333ff;
-  --primary-green: #00C851;
-  --background: #f5f5f5;
-  --text-primary: #333333;
-  --text-secondary: #666666;
-}
-
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background);
-  color: var(--text-primary);
+  background-color: #f5f5f5;
 }
