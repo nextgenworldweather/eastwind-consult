@@ -48,3 +48,6 @@ jobs:
         with:
           branch: gh-pages  # The branch to deploy to
           folder: dist      # The folder to deploy (output of Vite build)
+          token: ${{ secrets.GH_DEPLOY_TOKEN }}  # Use the secret PAT token
+          clean: true
+          force: true
