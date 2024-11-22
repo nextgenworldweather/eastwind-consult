@@ -38,10 +38,10 @@ export default defineConfig({
   plugins: [react()],
   base: '/eastwind-consult/',
   build: {
-    outDir: 'dist',
+    outDir: './dist',
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'), // Ensure this is correct
+        main: resolve(__dirname, './index.html'), // Ensure this is correct
       },
     },
   },
