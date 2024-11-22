@@ -40,14 +40,16 @@ jobs:
 
       # Debug: List files in the `dist` folder
       - name: Verify dist folder
-        run: ls -la ./dist
+        run: |
+          pwd
+          ls -la ./dist
 
       # Upload the build output as an artifact
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: github-pages
-          path: dist
+          path: ./dist
 
   deploy:
     needs: build
