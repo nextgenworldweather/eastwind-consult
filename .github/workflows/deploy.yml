@@ -18,7 +18,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Setup Node.js
+      # Setup Node.js ver. 22
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
