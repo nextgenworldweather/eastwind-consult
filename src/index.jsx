@@ -1,4 +1,4 @@
-/*
+
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -12,7 +12,8 @@ root.render(
   </React.StrictMode>
 );
 
-*/
+
+/*
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -23,3 +24,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>
 );
+
+*/
