@@ -8,7 +8,7 @@ export default defineConfig({
   root: './',
   publicDir: 'public',
   build: {
-    outDir: 'build',
+    outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
       input: {
