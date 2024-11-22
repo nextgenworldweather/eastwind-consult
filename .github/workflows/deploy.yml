@@ -18,63 +18,76 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: 'npm'
       
-      # Install all dependencies
+      # Install dependencies more efficiently
       - name: Install Dependencies
         run: |
           npm ci
-          npm install
-          npm install firebase peerjs react react-dom uuid
-          npm install -D @vitejs/plugin-react vite @types/react @types/react-dom
-          npm install -D gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
+          npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
+          npm install firebase peerjs uuid
       
-      # Configuration files (just to confirm)
-      - name: Generate postcss.config.js
+      # Generate config files
+      - name: Generate Config Files
         run: |
-          echo "module.exports = {" > postcss.config.js
-          echo "  plugins: {" >> postcss.config.js
-          echo "    tailwindcss: {}," >> postcss.config.js
-          echo "    autoprefixer: {}," >> postcss.config.js
-          echo "  }" >> postcss.config.js
-          echo "};" >> postcss.config.js
+          cat > postcss.config.js << 'EOL'
+          module.exports = {
+            plugins: {
+              tailwindcss: {},
+              autoprefixer: {},
+            }
+          };
+          EOL
 
-      - name: Generate tailwind.config.js
-        run: |
-          echo "module.exports = {" > tailwind.config.js
-          echo "  content: [" >> tailwind.config.js
-          echo "    './src/**/*.{js,jsx,ts,tsx}'," >> tailwind.config.js
-          echo "    './index.html'," >> tailwind.config.js
-          echo "  ]," >> tailwind.config.js
-          echo "  theme: {" >> tailwind.config.js
-          echo "    extend: {}," >> tailwind.config.js
-          echo "  }," >> tailwind.config.js
-          echo "  plugins: [" >> tailwind.config.js
-          echo "    require('@tailwindcss/forms')({" >> tailwind.config.js
-          echo "      strategy: 'class'," >> tailwind.config.js
-          echo "    })," >> tailwind.config.js
-          echo "  ]," >> tailwind.config.js
-          echo "};" >> tailwind.config.js
+          cat > tailwind.config.js << 'EOL'
+          module.exports = {
+            content: [
+              './src/**/*.{js,jsx,ts,tsx}',
+              './index.html',
+            ],
+            theme: {
+              extend: {},
+            },
+            plugins: [
+              require('@tailwindcss/forms')({
+                strategy: 'class',
+              }),
+            ],
+          };
+          EOL
       
-      # Build the project
+      # Build with error handling
       - name: Build
         run: |
-          npm run build
+          npm run build || (echo "Build failed" && exit 1)
       
-      # Debug: Check dist contents and size
-      - name: Check dist
+      # Verify build output
+      - name: Verify Build
         run: |
+          if [ ! -d "dist" ]; then
+            echo "dist directory not found!"
+            exit 1
+          fi
+          echo "Build size:"
           du -sh dist
+          echo "File count:"
           find dist -type f | wc -l
+          echo "Directory contents:"
           ls -la dist
 
       # Upload for GitHub Pages
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
