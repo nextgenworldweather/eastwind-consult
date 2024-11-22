@@ -27,7 +27,7 @@ jobs:
           npm install
           npm install firebase peerjs react react-dom uuid
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom
-          npm install -D gh-pages tailwindcss autoprefixer postcss
+          npm install -D gh-pages tailwindcss postcss autoprefixer @tailwindcss/forms
       
       # Configuration files (just to confirm)
       - name: Create configuration files
