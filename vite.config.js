@@ -1,19 +1,15 @@
-
-
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/eastwind-consult/',  // Base path for GitHub Pages
+  base: '/eastwind-consult/', // Required for GitHub Pages
   build: {
     outDir: 'dist',
     sourcemap: true,
     rollupOptions: {
-      input: {
-        main: resolve(__dirname, 'public/index.html'),
-      },
+      input: resolve(__dirname, 'index.html'), // Entry point
     },
   },
   resolve: {
@@ -23,34 +19,7 @@ export default defineConfig({
     extensions: ['.js', '.jsx', '.json'],
   },
   server: {
-    port: 3000,
+    port: 3000, // For local development only
     open: true,
   },
 });
-
-
-/*
-
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { resolve } from 'path';
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/eastwind-consult/',
-  build: {
-    outDir: 'dist',
-    rollupOptions: {
-      input: {
-        main: resolve(__dirname, './index.html'), // Ensure this is correct
-      },
-    },
-  },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
-    },
-  },
-});
-
-*/
