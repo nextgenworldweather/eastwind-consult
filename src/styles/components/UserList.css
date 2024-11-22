@@ -1,0 +1,38 @@
+.user-list {
+  width: 200px;
+  background: white;
+  border-right: 1px solid #eee;
+  padding: 20px;
+}
+
+.user-list h3 {
+  color: var(--primary-blue);
+  margin-bottom: 15px;
+}
+
+.users {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
+.user-status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary-green);
+}
+
+.user-name {
+  font-size: 14px;
+  color: var(--text-primary);
+}

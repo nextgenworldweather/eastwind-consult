@@ -1,0 +1,19 @@
+{
+  "database": {
+    "rules": {
+      ".read": true,
+      ".write": true,
+      "messages": {
+        ".indexOn": ["timestamp"],
+        "$message": {
+          ".validate": "newData.hasChildren(['text', 'username', 'timestamp'])"
+        }
+      },
+      "users": {
+        "$user": {
+          ".validate": "newData.hasChildren(['online', 'lastSeen'])"
+        }
+      }
+    }
+  }
+}
