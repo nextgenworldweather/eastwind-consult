@@ -25,11 +25,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-         npm ci
-         npm install firebase
-         npm install --save-dev gh-pages
-         npm install @vitejs/plugin-react vite @types/react @types/react-dom --save-dev
-         npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
+          npm ci
+          npm install firebase
+          npm install --save-dev gh-pages
+          npm install @vitejs/plugin-react vite @types/react @types/react-dom --save-dev
+          npm install -D tailwindcss @tailwindcss/forms autoprefixer postcss
 
       - name: Build
         run: |
@@ -40,10 +40,10 @@ jobs:
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          artifact_name: github-pages
-          path: 'dist' # Matches the `outDir` in vite.config.js
+          name: github-pages  # Ensure the artifact name matches here
+          path: './dist'      # Path to the build output directory (matches `outDir` in vite.config.js)
 
   deploy:
     needs: build
@@ -60,3 +60,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifact_name: github-pages  # This should match the artifact name uploaded in the build job
+          preview: false
