@@ -77,10 +77,10 @@ const ChatRoom = ({ username }) => {
         <div className="chat-main">
           <MessageList messages={messages} />
         </div>
-        <div className="chat-input-container">
+      </div>
+      <div className="chat-input-container">
           <MessageInput onSendMessage={sendMessage} />
         </div>
-      </div>
       {showVideo && <VideoConference username={username} />}
       <button 
         className="video-toggle-btn"
