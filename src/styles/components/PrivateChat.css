@@ -1,9 +1,5 @@
 .private-chat {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 300px;
-  height: 400px;
+ 
   background: white;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
