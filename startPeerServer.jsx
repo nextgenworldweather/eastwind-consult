@@ -7,7 +7,7 @@ function startPeerServer() {
   useEffect(() => {
     const peer = new Peer(undefined, {
       host: '/',
-      port: 9000,
+      port: 443,
       path: '/services/peerjs'
     });
 
