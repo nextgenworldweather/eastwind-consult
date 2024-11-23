@@ -1,9 +1,26 @@
+:root {
+  --primary-blue: #007bff;
+  --primary-green: #28a745;
+  --background-gray: #f8f9fa;
+  --text-dark: #343a40;
+  --text-light: #6c757d;
+  --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: var(--background-gray);
+  color: var(--text-dark);
+}
+
 .chat-room {
   display: flex;
   flex-direction: column;
   height: 100vh;
   padding: 20px;
   gap: 20px;
+  background: var(--background-gray);
 }
 
 .chat-container {
@@ -12,7 +29,8 @@
   gap: 20px;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
 }
 
 .chat-main {
@@ -20,21 +38,63 @@
   display: flex;
   flex-direction: column;
   padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow);
+  overflow-y: auto;
+}
+
+.chat-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-main::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+}
+
+.chat-main::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-green);
 }
 
 .video-toggle-btn {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  padding: 10px 20px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
   background-color: var(--primary-blue);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  box-shadow: var(--box-shadow);
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .video-toggle-btn:hover {
   background-color: var(--primary-green);
+  transform: translateY(-2px);
+}
+
+.video-toggle-btn:active {
+  transform: translateY(1px);
+}
+
+@media (max-width: 768px) {
+  .chat-room {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .chat-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .video-toggle-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
 }
