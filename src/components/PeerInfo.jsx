@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
-function startPeerServer() {
+function PeerInfo() {
   const [peerInfo, setPeerInfo] = useState(null);
 
   useEffect(() => {
-    fetch('https://nextgenworldweather.github.io/eastwind-consult/services/peerjs')
+    fetch('http://localhost:443/src')
       .then(response => response.json())
       .then(data => setPeerInfo(data))
       .catch(error => console.error('Error fetching peer info:', error));
@@ -23,4 +23,4 @@ function startPeerServer() {
   );
 }
 
-export default startPeerServer;
+export default PeerInfo;

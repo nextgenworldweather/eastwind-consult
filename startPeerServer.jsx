@@ -8,7 +8,7 @@ function startPeerServer() {
     const peer = new Peer(undefined, {
       host: '/',
       port: 443,
-      path: '/services/peerjs'
+      path: '/src'
     });
 
     setPeer(peer);
