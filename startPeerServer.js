@@ -1,8 +1,8 @@
 const { PeerServer } = require('peer');
 
 const peerServer = PeerServer({
-  port: 9000,
+  port: 443,
   path: '/services/peerjs',
 });
 
-console.log('PeerServer listening on port 9000');
+console.log('PeerServer listening on port 443');
