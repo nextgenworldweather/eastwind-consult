@@ -7,7 +7,8 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "peerserver": "node startPeerServer.js",
+    "seecode": "echo ./startPeerServer.jsx",
+    "peerserver": "npm run .startPeerServer.jsx",
     "clean": "rm -rf dist"
   },
   "dependencies": {
