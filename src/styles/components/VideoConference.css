@@ -7,6 +7,30 @@
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  z-index: 20; /* Ensures the video conference stays above other content */
+}
+
+.room-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #eee;
+}
+
+.room-controls .room-selector {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.room-controls .room-info {
+  margin-left: 10px;
+  font-size: 14px;
+  color: #333;
 }
 
 .video-grid {
@@ -57,9 +81,28 @@
   background: var(--primary-blue);
   color: white;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 14px;
+  transition: background-color 0.3s;
 }
 
 .video-controls button:hover {
   background: var(--primary-green);
+}
+
+.control-btn.disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .video-conference {
+    width: 100%;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+  }
+
+  .video-grid {
+    grid-template-columns: 1fr;
+  }
 }

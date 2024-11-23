@@ -123,6 +123,42 @@
   background-color: var(--primary-green);
 }
 
+.chat-input-container {
+  position: sticky;
+  bottom: 0; /* Sticks to the bottom of the chat room */
+  background: white; /* Matches the chat room's background */
+  border-top: 1px solid #eee; /* Divider for visual separation */
+  padding: 10px; /* Spacing inside the container */
+  display: flex;
+  gap: 10px; /* Space between input and button */
+  z-index: 10; /* Ensures it remains on top */
+}
+
+.chat-input-container input[type="text"] {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-input-container button {
+  padding: 10px 20px;
+  background-color: var(--primary-blue);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.chat-input-container button:hover {
+  background-color: var(--primary-green);
+}
+
+
 @media (max-width: 768px) {
   .chat-container {
     flex-direction: column;
