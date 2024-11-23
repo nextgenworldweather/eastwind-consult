@@ -73,7 +73,7 @@ const ChatRoom = ({ username }) => {
   return (
     <div className="chat-room">
       <div className="chat-container">
-        <UserList users={users} />
+        <UserList users={users} currentUser={username} />
         <div className="chat-main">
           <MessageList messages={messages} />
           <MessageInput onSendMessage={sendMessage} />
