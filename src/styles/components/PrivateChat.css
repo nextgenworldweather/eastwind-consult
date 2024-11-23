@@ -1,75 +1,130 @@
 .private-chat {
-    position:relative;
-    bottom: 20px;
-    right: 20px;
-    width: 300px;
-    height: 400px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    display: flex;
-    float: right;
-    flex-direction: column;
-    z-index: 1000;
-  }
-  
-  .private-chat-header {
-    padding: 10px;
-    background: #f0f0f0;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .private-chat-header button {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .private-chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  border: 2px solid var(--primary-blue);
+  /* Position above the video toggle button */
+  transform: translateY(-140px);
+}
+
+.private-chat-header {
+  padding: 12px 16px;
+  background: var(--gradient-blue);
+  color: var(--text-light);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+}
+
+.private-chat-header button {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.private-chat-header button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.private-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--background-light);
+}
+
+.private-message {
+  margin: 4px 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  max-width: 80%;
+  animation: messageAppear 0.3s ease;
+}
+
+.private-message.sent {
+  background: var(--gradient-blue);
+  color: var(--text-light);
+  margin-left: auto;
+}
+
+.private-message.received {
+  background: white;
+  color: var(--text-primary);
+  margin-right: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.message-time {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.private-chat-btn {
+  padding: 6px 12px;
+  background: var(--gradient-blue);
+  color: var(--text-light);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  margin-left: 8px;
+  font-weight: 500;
+  transition: var(--transition-normal);
+}
+
+.private-chat-btn:hover {
+  background: var(--gradient-green);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .private-chat {
+    width: calc(100% - 40px);
+    height: 50vh;
+    transform: translateY(-160px); /* Adjust for mobile spacing */
   }
   
   .private-message {
-    margin: 5px 0;
-    padding: 8px;
-    border-radius: 8px;
-    max-width: 80%;
+    max-width: 85%;
   }
-  
-  .private-message.sent {
-    background: #007bff;
-    color: white;
-    margin-left: auto;
-  }
-  
-  .private-message.received {
-    background: #e9ecef;
-    margin-right: auto;
-  }
-  
-  .message-time {
-    font-size: 0.8em;
-    opacity: 0.8;
-    margin-top: 4px;
-  }
-  
-  .private-chat-btn {
-    padding: 4px 8px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-left: 8px;
-  }
-  
-  .private-chat-btn:hover {
-    background: #0056b3;
-  }
+}
+
+/* Add scrollbar styling to match main chat */
+.private-chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+.private-chat-messages::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+.private-chat-messages::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+  transition: var(--transition-normal);
+}
+
+.private-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-green);
+}
