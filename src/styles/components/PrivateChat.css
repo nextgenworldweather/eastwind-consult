@@ -1,5 +1,5 @@
 .private-chat {
-    position: fixed;
+    position:relative;
     bottom: 20px;
     right: 20px;
     width: 300px;
@@ -8,6 +8,7 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     display: flex;
+    float: right;
     flex-direction: column;
     z-index: 1000;
   }
