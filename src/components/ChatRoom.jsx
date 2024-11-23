@@ -173,12 +173,12 @@ const ChatRoom = ({ username }) => {
             messages={messages} 
             currentUser={username}
           />
-          <div className="chat-input-container">
+          
             <MessageInput 
               onSendMessage={sendMessage} 
               disabled={!username}
             />
-          </div>
+          
         </div>
       </div>
       
