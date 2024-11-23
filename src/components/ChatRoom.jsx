@@ -4,7 +4,7 @@ import UserList from './UserList';
 import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, set } from 'firebase/database';
+import { ref, onValue, push, set, serverTimestamp } from 'firebase/database';
 import '../styles/components/ChatRoom.css';
 
 const ChatRoom = ({ username }) => {
@@ -13,16 +13,51 @@ const ChatRoom = ({ username }) => {
   const [showVideo, setShowVideo] = useState(false);
 
   useEffect(() => {
+    // Set up message listener
     const messagesRef = ref(db, 'messages');
+    const messagesUnsubscribe = onValue(messagesRef, (snapshot) => {
+      const messagesData = snapshot.val();
+      if (messagesData) {
+        const messagesList = Object.entries(messagesData).map(([id, message]) => ({
+          id,
+          ...message
+        }));
+        // Sort messages by timestamp
+        messagesList.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        setMessages(messagesList);
+      } else {
+        setMessages([]);
+      }
+    });
+
+    // Set up users listener
     const usersRef = ref(db, 'users');
+    const usersUnsubscribe = onValue(usersRef, (snapshot) => {
+      const usersData = snapshot.val();
+      if (usersData) {
+        const usersList = Object.keys(usersData);
+        setUsers(usersList);
+      } else {
+        setUsers([]);
+      }
+    });
 
     // Add user to online users
     const userRef = ref(db, `users/${username}`);
-    set(userRef, { online: true, lastSeen: new Date().toISOString() });
+    set(userRef, {
+      online: true,
+      lastSeen: serverTimestamp()
+    });
 
-    // Remove user when disconnected
+    // Cleanup function
     return () => {
-      set(userRef, null);
+      messagesUnsubscribe();
+      usersUnsubscribe();
+      // Update user status when leaving
+      set(userRef, {
+        online: false,
+        lastSeen: serverTimestamp()
+      });
     };
   }, [username]);
 
@@ -31,7 +66,7 @@ const ChatRoom = ({ username }) => {
     push(messagesRef, {
       text,
       username,
-      timestamp: new Date().toISOString()
+      timestamp: serverTimestamp()
     });
   };
 
