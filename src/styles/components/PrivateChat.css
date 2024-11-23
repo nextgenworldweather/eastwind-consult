@@ -8,7 +8,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   display: flex;
-  flex-direction: column;
+  flex-direction:row;
   z-index: 1000;
   border: 2px solid var(--primary-blue);
   /* Position above the video toggle button */
