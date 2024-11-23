@@ -3,49 +3,71 @@
   right: 20px;
   bottom: 80px;
   width: 300px;
-  background: white;
+  background: #f0f8ff; /* Light blue tint background */
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 12px rgba(0, 83, 255, 0.15);
   overflow: hidden;
-  z-index: 20; /* Ensures the video conference stays above other content */
+  z-index: 20;
+  border: 2px solid #0055ff;
+  transition: all 0.3s ease;
+}
+
+.video-conference:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 83, 255, 0.2);
 }
 
 .room-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  background: #f8f9fa;
-  border-bottom: 1px solid #eee;
+  padding: 12px;
+  background: linear-gradient(135deg, #0055ff, #0044cc);
+  border-bottom: 2px solid #0044cc;
 }
 
 .room-controls .room-selector {
   flex: 1;
   padding: 8px;
-  border: 1px solid #ddd;
+  border: 2px solid #ffdb4d; /* Yellow border */
   border-radius: 5px;
   font-size: 14px;
+  background: white;
+  transition: border-color 0.3s;
+}
+
+.room-controls .room-selector:focus {
+  border-color: #ff3333; /* Red border on focus */
+  outline: none;
 }
 
 .room-controls .room-info {
   margin-left: 10px;
   font-size: 14px;
-  color: #333;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .video-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  padding: 10px;
+  gap: 12px;
+  padding: 12px;
+  background: #f8f9fa;
 }
 
 .video-container {
   position: relative;
   aspect-ratio: 16/9;
   background: #000;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
+  border: 2px solid #0055ff;
+  transition: transform 0.3s;
+}
+
+.video-container:hover {
+  transform: scale(1.02);
 }
 
 .video-container video {
@@ -58,40 +80,51 @@
   position: absolute;
   bottom: 10px;
   left: 10px;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 85, 255, 0.8); /* Blue background */
   color: white;
-  padding: 4px 8px;
+  padding: 4px 10px;
   border-radius: 4px;
   font-size: 12px;
+  font-weight: 500;
 }
 
 .video-controls {
   display: flex;
-  gap: 10px;
-  padding: 10px;
-  background: #f8f9fa;
-  border-top: 1px solid #eee;
+  gap: 12px;
+  padding: 12px;
+  background: linear-gradient(135deg, #0055ff, #0044cc);
+  border-top: 2px solid #0044cc;
 }
 
 .video-controls button {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
   border: none;
-  border-radius: 4px;
-  background: var(--primary-blue);
+  border-radius: 6px;
+  background: #33cc33; /* Green background */
   color: white;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s;
+  font-weight: 500;
+  transition: all 0.3s;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .video-controls button:hover {
-  background: var(--primary-green);
+  background: #ff3333; /* Red on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .control-btn.disabled {
   background: #ccc;
   cursor: not-allowed;
+  transform: none !important;
+}
+
+.control-btn.disabled:hover {
+  background: #ccc;
+  box-shadow: none;
 }
 
 @media (max-width: 480px) {
