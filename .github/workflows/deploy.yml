@@ -59,7 +59,7 @@ jobs:
       # Build with error handling
       - name: Build
         run: |
-          tree
+          tree | tail -25
           npm run build || (echo "Build failed" && exit 1)
       
       # Verify build output
