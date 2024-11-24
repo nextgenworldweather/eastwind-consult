@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { db, storage } from '../utils/firebase';
+import { db, storage } from '/src/utils/firebase';
 import { ref, onValue, push, query, orderByChild, serverTimestamp, update } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Card from '/src/components/ui/card';
