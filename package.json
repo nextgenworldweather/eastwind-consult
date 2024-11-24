@@ -23,6 +23,8 @@
     "react-toastify": "^9.0.5",
     "uuid": "^9.0.1",
     "lucide-react": "^0.39.0",
+    "tailwind-merge": "^1.14.0",
+    "clsx": "^2.0.0",
     "emoji-picker-react": "^4.7.12",
     "core-js": "^3.39.0",
     "core-js-pure": "^3.39.0",

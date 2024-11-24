@@ -2,7 +2,6 @@
 import React from 'react';
 import Avatar from 'react-avatar';
 import moment from 'moment';
-import { cn } from "@/lib/utils";
 
 export function MessageWithAvatar({ message, isSender }) {
   const renderMessageContent = () => {
@@ -21,7 +20,7 @@ export function MessageWithAvatar({ message, isSender }) {
             href={message.fileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-primary hover:underline"
+            className="flex items-center gap-2 text-blue-500 hover:underline"
           >
             <svg
               className="w-4 h-4"
@@ -48,11 +47,24 @@ export function MessageWithAvatar({ message, isSender }) {
     return moment(timestamp).fromNow();
   };
 
+  const messageContainerClass = `flex items-start gap-2 px-4 py-2 ${
+    isSender ? 'flex-row-reverse' : ''
+  }`;
+
+  const messageContentClass = `max-w-[70%] rounded-lg px-3 py-2 ${
+    isSender 
+      ? 'bg-blue-500 text-white' 
+      : 'bg-gray-100 text-gray-900'
+  }`;
+
+  const timestampClass = `text-xs mt-1 ${
+    isSender 
+      ? 'text-white/70' 
+      : 'text-gray-500'
+  }`;
+
   return (
-    <div className={cn(
-      "flex items-start gap-2 px-4 py-2",
-      isSender && "flex-row-reverse"
-    )}>
+    <div className={messageContainerClass}>
       {!isSender && (
         <Avatar 
           name={message.sender} 
@@ -61,19 +73,9 @@ export function MessageWithAvatar({ message, isSender }) {
           className="flex-shrink-0"
         />
       )}
-      <div className={cn(
-        "max-w-[70%] rounded-lg px-3 py-2",
-        isSender 
-          ? "bg-primary text-primary-foreground" 
-          : "bg-muted text-muted-foreground",
-      )}>
+      <div className={messageContentClass}>
         {renderMessageContent()}
-        <div className={cn(
-          "text-xs mt-1",
-          isSender 
-            ? "text-primary-foreground/70" 
-            : "text-muted-foreground/70"
-        )}>
+        <div className={timestampClass}>
           {message.timestamp ? formatTimestamp(message.timestamp) : 'Sending...'}
         </div>
       </div>
