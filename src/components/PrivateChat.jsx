@@ -38,6 +38,7 @@ const MessageInput = ({ onSendMessage }) => {
 const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
+  const [chatVisible, setChatVisible] = useState(false);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -57,7 +58,11 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
           }))
           .sort((a, b) => a.timestamp - b.timestamp);
         setMessages(messagesList);
-        notify(`New message from ${targetUser}`, 'info');
+
+        // Notify only if the chat UI is not visible
+        if (!chatVisible) {
+          notify(`New message from ${targetUser}`, 'info');
+        }
       } else {
         setMessages([]);
       }
@@ -67,7 +72,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser]);
+  }, [currentUser, targetUser, chatVisible]);
 
   const sendPrivateMessage = (text) => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
@@ -83,13 +88,17 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
   };
 
+  const handleOpenChat = () => {
+    setChatVisible(true);
+  };
+
   // Calculate right position based on chat window index
   const rightPosition = 20 + (position * 320); // 320px = width + gap
 
   return (
     <>
       <Card 
-        className="fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden"
+        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
         style={{ right: `${rightPosition}px` }}
       >
         <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -98,7 +107,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             variant="ghost" 
             size="icon" 
             className="text-white hover:bg-blue-400/20"
-            onClick={onClose}
+            onClick={() => { onClose(); setChatVisible(false); }}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -121,6 +130,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
 
         <MessageInput onSendMessage={sendPrivateMessage} />
       </Card>
+
+      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
+        Open Chat with {targetUser}
+      </Button>
 
       <Notification />
     </>
