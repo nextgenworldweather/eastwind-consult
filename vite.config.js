@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import commonjs from 'vite-plugin-commonjs';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), commonjs()],
   base: '/eastwind-consult/', // Required for GitHub Pages
   build: {
     outDir: 'dist',
@@ -18,6 +19,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      'core-js-pure': 'core-js-pure/es',
       '@': resolve(__dirname, './src'),
     },
     extensions: ['.js', '.jsx', '.json'],
