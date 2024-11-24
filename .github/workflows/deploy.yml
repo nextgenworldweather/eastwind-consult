@@ -37,7 +37,7 @@ jobs:
           # Install react-avatar with necessary peer dependency
           npm install react-avatar prop-types --save vite-plugin-commonjs --save-dev
 
-          npm install vite@latest emoji-mart@latest --save-dev
+          npm install vite@latest emoji-mart@latest --save-dev emoji-picker-react
       
       # Generate config files
       - name: Generate Config Files

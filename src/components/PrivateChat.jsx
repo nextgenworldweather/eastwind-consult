@@ -8,8 +8,7 @@ import ScrollArea from '/src/components/ui/scroll-area';
 import { X, Send, Paperclip, Smile } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
-import { EmojiPicker } from 'react-emoji-picker';
-import 'react-emoji-picker/css/style.css';
+import EmojiPicker from 'emoji-picker-react';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
@@ -38,8 +37,8 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     }
   };
 
-  const handleEmojiSelect = (emoji) => {
-    setMessage((prevMessage) => prevMessage + emoji.native);
+  const handleEmojiClick = (event, emojiObject) => {
+    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
     setShowEmojiPicker(false);
   };
 
@@ -59,7 +58,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
       <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
         <Smile className="h-4 w-4" />
       </Button>
-      {showEmojiPicker && <EmojiPicker onEmojiClick={handleEmojiSelect} />}
+      {showEmojiPicker && <EmojiPicker onEmojiClick={handleEmojiClick} />}
       <Input
         value={message}
         onChange={handleTyping}
