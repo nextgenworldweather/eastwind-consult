@@ -25,8 +25,9 @@ jobs:
         run: |
           npm install
           npm ci
+          npm install -D react-avatar react-toastify
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
-          npm install firebase peerjs uuid lucide-react @mui/material @emotion/react @emotion/styled react-avatar react-toastify
+          npm install firebase peerjs uuid lucide-react @mui/material @emotion/react @emotion/styled 
       
       # Generate config files
       - name: Generate Config Files
