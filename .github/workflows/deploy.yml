@@ -26,7 +26,7 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install 
 
-          npm install core-js-pure moment emoji-mart is-retina charenc is-buffer 
+          npm install core-js-pure moment is-retina charenc is-buffer emoji-mart --save vite-plugin-css-import --save-dev
           
           # Install dev dependencies explicitly
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss mocha webpack
@@ -36,6 +36,8 @@ jobs:
           
           # Install react-avatar with necessary peer dependency
           npm install react-avatar prop-types --save
+
+          npm install vite@latest emoji-mart@latest --save-dev
       
       # Generate config files
       - name: Generate Config Files
