@@ -35,11 +35,18 @@ const MessageInput = ({ onSendMessage }) => {
   );
 };
 
-const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
+const PrivateChat = ({ currentUser, targetUser, onClose, position = 0, isOpenFromMessage = false }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
-  const [chatVisible, setChatVisible] = useState(false);
+  const [chatVisible, setChatVisible] = useState(isOpenFromMessage);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Handle initial open state from message click
+  useEffect(() => {
+    if (isOpenFromMessage) {
+      setChatVisible(true);
+    }
+  }, [isOpenFromMessage]);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -59,14 +66,11 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
           }))
           .sort((a, b) => a.timestamp - b.timestamp);
 
-        // Get the last message before updating state
         const lastMessage = messagesList[messagesList.length - 1];
         const previousLastMessage = messages[messages.length - 1];
 
-        // Update messages state
         setMessages(messagesList);
 
-        // Check if this is a new message and from the other user
         if (lastMessage && 
             lastMessage.sender !== currentUser && 
             (!previousLastMessage || lastMessage.id !== previousLastMessage.id)) {
@@ -81,7 +85,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser]); // Removed chatVisible dependency
+  }, [currentUser, targetUser]);
 
   const sendPrivateMessage = (text) => {
     if (!chatId) return;
@@ -148,17 +152,21 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
       )}
 
       {/* Chat Button */}
-      <Button 
-        onClick={handleOpenChat} 
-        className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded flex items-center gap-2"
+      <div 
+        onClick={handleOpenChat}
+        className="fixed bottom-10 right-10 cursor-pointer"
       >
-        Chat with {targetUser}
-        {unreadCount > 0 && (
-          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
-            {unreadCount}
-          </span>
-        )}
-      </Button>
+        <Button 
+          className="bg-blue-500 text-white p-2 rounded flex items-center gap-2"
+        >
+          Chat with {targetUser}
+          {unreadCount > 0 && (
+            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
+              {unreadCount}
+            </span>
+          )}
+        </Button>
+      </div>
 
       <Notification />
     </>
