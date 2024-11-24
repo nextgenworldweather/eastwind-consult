@@ -36,10 +36,6 @@ jobs:
           
           # Install react-avatar with necessary peer dependency
           npm install react-avatar prop-types --save --legacy-peer-deps
-
-      # Add NODE_OPTIONS to handle potential memory issues with Node.js 22
-      - name: Set Node Options
-        run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
       
       # Generate config files
       - name: Generate Config Files
