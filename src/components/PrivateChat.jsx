@@ -18,6 +18,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const handleTyping = (e) => {
     setMessage(e.target.value);
     if (!isTyping) {
+ {
       setIsTyping(true);
       set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
     }

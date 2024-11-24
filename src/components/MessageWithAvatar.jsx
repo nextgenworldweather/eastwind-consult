@@ -41,7 +41,7 @@ const MessageWithAvatar = ({ message, isSender }) => {
       default:
         return <div className="break-words">{message.text}</div>;
     }
-  };
+  }; 
 
   const formatTimestamp = (timestamp) => {
     return moment(timestamp).fromNow();

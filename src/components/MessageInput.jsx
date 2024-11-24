@@ -35,18 +35,24 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const handleEmojiClick = (event, emojiObject) => {
     setMessage((prevMessage) => prevMessage + emojiObject.emoji);
     setShowEmojiPicker(false);
-  };
+  };  
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        onSendMessage(reader.result, 'file');
+        const fileUrl = reader.result;
+        onSendMessage({
+          text: file.name,
+          fileUrl,
+          type: 'file'
+        });
       };
       reader.readAsDataURL(file);
     }
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
