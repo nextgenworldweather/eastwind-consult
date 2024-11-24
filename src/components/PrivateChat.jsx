@@ -1,13 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { db } from '/src/utils/firebase';
+import React, { useState, useCallback, useEffect } from 'react';
+import { db } from '../utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
-import { Card, CardHeader, CardTitle, CardContent } from '/src/components/ui/card';
-import { Button } from '/src/components/ui/button';
-import { Input } from '/src/components/ui/input';
-import { ScrollArea } from '/src/components/ui/scroll-area';
+import Card from '@/components/ui/card';
+import Button from '@/components/ui/button';
+import Input from '@/components/ui/input';
+import ScrollArea from '@/components/ui/scroll-area';
 import { X, Send, Paperclip, Smile } from 'lucide-react';
-import { Notification, notify } from '/src/components/Notification';
-import { MessageWithAvatar } from '/src/components/MessageWithAvatar';
+import { Notification, notify } from '@/components/Notification';
+import MessageWithAvatar from '@/components/MessageWithAvatar';
 import EmojiPicker from 'emoji-picker-react';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
@@ -181,16 +181,16 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         }`}
         style={{ right: rightPosition }}
       >
-        <CardHeader className="p-4 bg-gradient-to-r from-blue-500 to-blue-600">
+        <div className="p-4 bg-gradient-to-r from-blue-500 to-blue-600">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-white text-sm font-medium flex items-center gap-2">
+            <div className="text-white text-sm font-medium flex items-center gap-2">
               {targetUser}
               {unreadMessages.length > 0 && (
                 <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
                   {unreadMessages.length}
                 </span>
               )}
-            </CardTitle>
+            </div>
             <Button 
               variant="ghost" 
               size="icon" 
@@ -200,9 +200,9 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
               <X className="h-4 w-4" />
             </Button>
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="flex-1 p-0">
+        <div className="flex-1 p-0">
           <ScrollArea className="h-full">
             <div className="p-4 space-y-4">
               {messages.map((message) => (
@@ -219,7 +219,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
               )}
             </div>
           </ScrollArea>
-        </CardContent>
+        </div>
 
         <MessageInput 
           onSendMessage={sendPrivateMessage}
