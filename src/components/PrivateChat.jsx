@@ -63,6 +63,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         const lastMessage = messagesList[messagesList.length - 1];
         if (lastMessage && lastMessage.sender !== currentUser) {
           if (lastMessage.id !== lastMessageId) {
+            console.log('New message received:', lastMessage);
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
             setChatVisible(true); // Ensure chat is set to visible
@@ -94,6 +95,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   };
 
   const handleOpenChat = () => {
+    console.log('Chat manually opened');
     setChatVisible(true);
   };
 
