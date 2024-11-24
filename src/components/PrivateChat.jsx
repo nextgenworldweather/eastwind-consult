@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { X, Send, Paperclip, Smile } from 'lucide-react';
-import { Notification, notify } from '/src/components/Notification';
+import Notification from '/src/components/Notification';
+import notify from '/src/components/Notification';
 import { MessageWithAvatar } from '/src/components/MessageWithAvatar';
 import EmojiPicker from 'emoji-picker-react';
 
