@@ -1,84 +1,90 @@
-import React, { useState, useEffect } from 'react';
-import { db } from '../utils/firebase';
-import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
+import React, { useState, useEffect, useRef } from 'react';
+import { db, storage } from '../utils/firebase';
+import { ref, onValue, push, query, orderByChild, serverTimestamp, update } from 'firebase/database';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Card from '/src/components/ui/card';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
 import ScrollArea from '/src/components/ui/scroll-area';
-import { X, Send, Paperclip, Smile } from 'lucide-react';
+import { X, Send, Smile, Paperclip } from 'lucide-react';
+import EmojiPicker from 'emoji-picker-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
-import { Picker } from 'emoji-mart';
-import 'emoji-mart/css/emoji-mart.css';
 
-const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
+const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
+
+const MessageInput = ({ onSendMessage, onFileUpload }) => {
   const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  const handleTyping = (e) => {
-    setMessage(e.target.value);
-    if (!isTyping) {
-      setIsTyping(true);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
-    }
-    if (e.target.value === '') {
-      setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
-    }
-  };
+  const fileInputRef = useRef(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim()) {
       onSendMessage(message.trim());
       setMessage('');
-      setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
-  const handleEmojiSelect = (emoji) => {
-    setMessage((prevMessage) => prevMessage + emoji.native);
+  const handleEmojiClick = (emojiObject) => {
+    setMessage(prev => prev + emojiObject.emoji);
     setShowEmojiPicker(false);
   };
 
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onSendMessage(reader.result, 'file');
-      };
-      reader.readAsDataURL(file);
+      try {
+        await onFileUpload(file);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        notify('Failed to upload file', 'error');
+      }
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-        <Smile className="h-4 w-4" />
-      </Button>
-      {showEmojiPicker && <Picker onSelect={handleEmojiSelect} />}
-      <Input
-        value={message}
-        onChange={handleTyping}
-        placeholder="Type your message..."
-        className="flex-1"
-      />
-      <input
-        type="file"
-        id="file-input"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
-      <Button type="button" size="icon" onClick={() => document.getElementById('file-input').click()}>
-        <Paperclip className="h-4 w-4" />
-      </Button>
-      <Button type="submit" size="icon">
-        <Send className="h-4 w-4" />
-      </Button>
-    </form>
+    <div className="relative">
+      {showEmojiPicker && (
+        <div className="absolute bottom-full mb-2">
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        </div>
+      )}
+      <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+        >
+          <Smile className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          size="icon"
+          variant="ghost"
+          onClick={() => fileInputRef.current?.click()}
+        >
+          <Paperclip className="h-4 w-4" />
+        </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+          accept="image/*,.pdf,.doc,.docx"
+        />
+        <Input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="Type your message..."
+          className="flex-1"
+        />
+        <Button type="submit" size="icon">
+          <Send className="h-4 w-4" />
+        </Button>
+      </form>
+    </div>
   );
 };
 
@@ -86,9 +92,6 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
-  const [lastMessageId, setLastMessageId] = useState(null);
-  const [unreadMessages, setUnreadMessages] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -96,116 +99,131 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     setChatId(privateChatId);
 
     const chatRef = ref(db, `privateChats/${privateChatId}/messages`);
-    const typingRef = ref(db, `privateChats/${privateChatId}/typing/${targetUser}`);
     const messagesQuery = query(chatRef, orderByChild('timestamp'));
 
-    const unsubscribeMessages = onValue(messagesQuery, (snapshot) => {
+    const unsubscribe = onValue(messagesQuery, (snapshot) => {
       const messagesData = snapshot.val();
       if (messagesData) {
-        const messagesList = Object.entries(messagesData)
-          .map(([id, message]) => ({
-            id,
-            ...message
-          }))
-          .sort((a, b) => a.timestamp - b.timestamp);
+        const messagesList = Object.entries(messagesData).map(([id, message]) => ({
+          id,
+          ...message,
+          reactions: message.reactions || {}
+        }));
         setMessages(messagesList);
-
-        const lastMessage = messagesList[messagesList.length - 1];
-        if (lastMessage && lastMessage.sender !== currentUser) {
-          if (lastMessage.id !== lastMessageId) {
-            setLastMessageId(lastMessage.id);
-            setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
-            notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true); // Ensure chat is set to visible
-          }
-        }
       } else {
         setMessages([]);
       }
-    }, (error) => {
-      console.error('Error loading messages:', error);
-      notify('Failed to load messages', 'error');
     });
 
-    const unsubscribeTyping = onValue(typingRef, (snapshot) => {
-      setIsTyping(snapshot.val() || false);
-    });
+    return () => unsubscribe();
+  }, [currentUser, targetUser]);
 
-    return () => {
-      unsubscribeMessages();
-      unsubscribeTyping();
-    };
-  }, [currentUser, targetUser, lastMessageId, chatVisible]);
-
-  const sendPrivateMessage = (text, type = 'text') => {
+  const sendPrivateMessage = (text, type = 'text', fileUrl = null) => {
+    if (!chatId) return;
+    
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
     push(messageRef, {
       text,
       type,
+      fileUrl,
       sender: currentUser,
       receiver: targetUser,
-      timestamp: serverTimestamp()
-    })
-    .catch((error) => {
-      console.error('Error sending message:', error);
-      notify('Failed to send message', 'error');
+      timestamp: serverTimestamp(),
+      reactions: {}
     });
   };
 
-  const handleOpenChat = () => {
-    setChatVisible(true);
-    setUnreadMessages([]); // Reset unread messages when chat is opened
+  const handleFileUpload = async (file) => {
+    const fileRef = storageRef(storage, `chats/${chatId}/${file.name}`);
+    await uploadBytes(fileRef, file);
+    const downloadUrl = await getDownloadURL(fileRef);
+    
+    const fileType = file.type.startsWith('image/') ? 'image' : 'file';
+    sendPrivateMessage(file.name, fileType, downloadUrl);
   };
 
-  // Calculate right position based on chat window index
-  const rightPosition = 20 + (position * 320); // 320px = width + gap
+  const handleReaction = async (messageId, emoji) => {
+    const messageRef = ref(db, `privateChats/${chatId}/messages/${messageId}/reactions/${currentUser}`);
+    const currentReaction = messages.find(m => m.id === messageId)?.reactions?.[currentUser];
+    
+    if (currentReaction === emoji) {
+      // Remove reaction
+      update(messageRef, null);
+    } else {
+      // Add or update reaction
+      update(messageRef, emoji);
+    }
+  };
 
   return (
     <>
-      <Card 
-        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
-        style={{ right: `${rightPosition}px` }}
-      >
-        <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <h3 className="font-medium truncate">
-            Chat with {targetUser} 
-            {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
-          </h3>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-white hover:bg-blue-400/20"
-            onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => {
-              const isSender = message.sender === currentUser;
-              return (
-                <MessageWithAvatar 
-                  key={message.id}
-                  message={message}
-                  isSender={isSender}
-                />
-              );
-            })}
-            {isTyping && (
-              <div className="typingIndicator">
-                {`${targetUser} is typing...`}
-              </div>
-            )}
+      {chatVisible && (
+        <Card 
+          className="fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden"
+          style={{ right: `${rightPosition}px` }}
+        >
+          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <h3 className="font-medium truncate">Chat with {targetUser}</h3>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-blue-400/20"
+              onClick={() => {
+                setChatVisible(false);
+                onClose();
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
-        </ScrollArea>
 
-        <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
-      </Card>
+          <ScrollArea className="flex-1 p-4">
+            <div className="space-y-4">
+              {messages.map((message) => (
+                <div key={message.id} className="relative group">
+                  <MessageWithAvatar 
+                    message={message}
+                    isSender={message.sender === currentUser}
+                  />
+                  <div className="reaction-buttons opacity-0 group-hover:opacity-100 absolute top-0 right-0 bg-white shadow-md rounded-lg p-1 flex gap-1">
+                    {REACTION_EMOJIS.map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={() => handleReaction(message.id, emoji)}
+                        className={`p-1 hover:bg-gray-100 rounded ${
+                          message.reactions?.[currentUser] === emoji ? 'bg-blue-100' : ''
+                        }`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                  {Object.entries(message.reactions || {}).length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {Object.entries(message.reactions).map(([user, emoji]) => (
+                        <span key={`${message.id}-${user}`} className="bg-gray-100 rounded px-1 text-xs">
+                          {emoji} {user === currentUser ? 'You' : user}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
 
-      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
-        Open Chat with {targetUser}
+          <MessageInput 
+            onSendMessage={sendPrivateMessage}
+            onFileUpload={handleFileUpload}
+          />
+        </Card>
+      )}
+
+      <Button 
+        onClick={() => setChatVisible(true)}
+        className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded"
+      >
+        Chat with {targetUser}
       </Button>
 
       <Notification />

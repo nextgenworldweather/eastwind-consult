@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Avatar from 'react-avatar';
-import moment from 'moment';
-import { Picker } from 'emoji-mart';
-import 'emoji-mart/css/emoji-mart.css';
-import Button from '/src/components/ui/button';
-import { Smile } from 'lucide-react';
 import '/src/styles/components/MessageWithAvatar.css';
 
-const MessageWithAvatar = ({ message, isSender, onReact }) => {
-  const [showReactionPicker, setShowReactionPicker] = useState(false);
-
-  const formatTimestamp = (timestamp) => {
-    return moment(timestamp).fromNow();
-  };
-
-  const handleReaction = (emoji) => {
-    setShowReactionPicker(false);
-    onReact(message.id, emoji.native);
+const MessageWithAvatar = ({ message, isSender }) => {
+  const renderMessageContent = () => {
+    switch (message.type) {
+      case 'image':
+        return (
+          <img 
+            src={message.fileUrl} 
+            alt={message.text}
+            className="max-w-[200px] rounded-lg"
+          />
+        );
+      case 'file':
+        return (
+          <a 
+            href={message.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-blue-500 hover:underline"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            {message.text}
+          </a>
+        );
+      default:
+        return <div className="break-words">{message.text}</div>;
+    }
   };
 
   return (
@@ -30,28 +53,16 @@ const MessageWithAvatar = ({ message, isSender, onReact }) => {
         />
       )}
       <div className={`messageContent ${isSender ? 'sender' : 'receiver'}`}>
-        <div className="break-words">{message.text}</div>
-        {message.reactions && (
-          <div className="reactions">
-            {message.reactions.map((reaction, index) => (
-              <span key={index} className="reaction">{reaction}</span>
-            ))}
-          </div>
-        )}
+        {renderMessageContent()}
         <div className="timestamp">
           {message.timestamp
-            ? formatTimestamp(message.timestamp)
+            ? new Date(message.timestamp).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })
             : 'Sending...'}
         </div>
       </div>
-      <Button type="button" onClick={() => setShowReactionPicker(!showReactionPicker)}>
-        <Smile className="h-4 w-4" />
-      </Button>
-      {showReactionPicker && (
-        <div className="absolute bottom-12 left-0 z-10">
-          <Picker onSelect={handleReaction} />
-        </div>
-      )}
     </div>
   );
 };
