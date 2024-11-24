@@ -47,12 +47,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const fileUrl = reader.result;
-        onSendMessage({
-          text: file.name,
-          fileUrl,
-          type: 'file'
-        });
+        onSendMessage(reader.result, 'file');
       };
       reader.readAsDataURL(file);
     }
@@ -60,7 +55,6 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      {/* Emoji Picker */}
       <div style={{ position: 'relative' }}>
         <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
           <Smile className="h-4 w-4" />
@@ -71,16 +65,12 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
           </div>
         )}
       </div>
-
-      {/* Message Input */}
       <Input
         value={message}
         onChange={handleTyping}
         placeholder="Type your message..."
         className="flex-1"
       />
-
-      {/* File Upload */}
       <input
         type="file"
         id="file-input"
@@ -90,8 +80,6 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
       <Button type="button" size="icon" onClick={() => document.getElementById('file-input').click()}>
         <Paperclip className="h-4 w-4" />
       </Button>
-
-      {/* Send Button */}
       <Button type="submit" size="icon">
         <Send className="h-4 w-4" />
       </Button>
