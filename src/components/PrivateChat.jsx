@@ -59,9 +59,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
           .sort((a, b) => a.timestamp - b.timestamp);
         setMessages(messagesList);
 
-        // Notify only if the chat UI is not visible
-        if (!chatVisible) {
+        // Only notify and open chat if the message is not from the current user
+        if (messagesList.length > 0 && messagesList[messagesList.length - 1].sender !== currentUser) {
           notify(`New message from ${targetUser}`, 'info');
+          setChatVisible(true);
         }
       } else {
         setMessages([]);
