@@ -3,6 +3,7 @@ import MessageList from './MessageList';
 import UserList from './UserList';
 import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
+import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, set, serverTimestamp, off } from 'firebase/database';
 import '../styles/components/ChatRoom.css';
@@ -24,6 +25,7 @@ const ChatRoom = ({ username }) => {
   const [showVideo, setShowVideo] = useState(false);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [privateChats, setPrivateChats] = useState(new Map());
 
   // Transform messages data
   const transformMessages = useCallback((messagesData) => {
@@ -33,7 +35,7 @@ const ChatRoom = ({ username }) => {
       .map(([id, message]) => ({
         id,
         ...message,
-        timestamp: message.timestamp || Date.now(), // Fallback for missing timestamp
+        timestamp: message.timestamp || Date.now(),
       }))
       .sort((a, b) => a.timestamp - b.timestamp);
   }, []);
@@ -44,6 +46,19 @@ const ChatRoom = ({ username }) => {
     return Object.entries(usersData)
       .filter(([_, userData]) => userData.online)
       .map(([userId]) => userId);
+  }, []);
+
+  // Handle private chat
+  const openPrivateChat = useCallback((targetUser) => {
+    setPrivateChats(prev => new Map(prev).set(targetUser, true));
+  }, []);
+
+  const closePrivateChat = useCallback((targetUser) => {
+    setPrivateChats(prev => {
+      const newChats = new Map(prev);
+      newChats.delete(targetUser);
+      return newChats;
+    });
   }, []);
 
   // Handle user presence
@@ -59,7 +74,6 @@ const ChatRoom = ({ username }) => {
     try {
       await set(userRef, userStatus);
 
-      // Set up disconnect hook
       window.addEventListener('beforeunload', () => {
         set(userRef, {
           ...userStatus,
@@ -81,10 +95,8 @@ const ChatRoom = ({ username }) => {
     const messagesRef = ref(db, FIREBASE_PATHS.MESSAGES);
     const usersRef = ref(db, FIREBASE_PATHS.USERS);
 
-    // Set up listeners
     const setupListeners = async () => {
       try {
-        // Messages listener
         onValue(messagesRef, (snapshot) => {
           setMessages(transformMessages(snapshot.val()));
           setIsLoading(false);
@@ -94,7 +106,6 @@ const ChatRoom = ({ username }) => {
           setIsLoading(false);
         });
 
-        // Users listener
         onValue(usersRef, (snapshot) => {
           setUsers(transformUsers(snapshot.val()));
         }, (error) => {
@@ -102,7 +113,6 @@ const ChatRoom = ({ username }) => {
           setError('Failed to load users');
         });
 
-        // Set up user presence
         await handleUserPresence();
       } catch (err) {
         console.error('Setup error:', err);
@@ -113,13 +123,10 @@ const ChatRoom = ({ username }) => {
 
     setupListeners();
 
-    // Cleanup function
     return () => {
-      // Remove listeners
       off(messagesRef);
       off(usersRef);
 
-      // Update user status
       if (username) {
         set(ref(db, `${FIREBASE_PATHS.USERS}/${username}`), {
           online: false,
@@ -167,18 +174,20 @@ const ChatRoom = ({ username }) => {
   return (
     <div className="chat-room">
       <div className="chat-container">
-        <MemoizedUserList users={users} currentUser={username} />
+        <MemoizedUserList 
+          users={users} 
+          currentUser={username} 
+          onStartPrivateChat={openPrivateChat}
+        />
         <div className="chat-main">
           <MemoizedMessageList 
             messages={messages} 
             currentUser={username}
           />
-          
-            <MessageInput 
-              onSendMessage={sendMessage} 
-              disabled={!username}
-            />
-          
+          <MessageInput 
+            onSendMessage={sendMessage} 
+            disabled={!username}
+          />
         </div>
       </div>
       
@@ -196,6 +205,19 @@ const ChatRoom = ({ username }) => {
       >
         {showVideo ? 'Hide Video' : 'Show Video'}
       </button>
+
+      {/* Private Chat Windows */}
+      {Array.from(privateChats.entries()).map(([targetUser, isOpen], index) => (
+        isOpen && (
+          <PrivateChat
+            key={targetUser}
+            currentUser={username}
+            targetUser={targetUser}
+            onClose={() => closePrivateChat(targetUser)}
+            position={index}
+          />
+        )
+      ))}
     </div>
   );
 };
