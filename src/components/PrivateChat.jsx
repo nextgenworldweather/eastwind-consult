@@ -40,6 +40,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
   const [lastMessageId, setLastMessageId] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -67,6 +68,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
             setChatVisible(true); // Ensure chat is set to visible
+            setUnreadCount((prevCount) => prevCount + 1); // Increment unread count
           }
         }
       } else {
@@ -97,6 +99,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const handleOpenChat = () => {
     console.log('Chat manually opened');
     setChatVisible(true);
+    setUnreadCount(0); // Reset unread count when chat is opened
   };
 
   // Calculate right position based on chat window index
@@ -109,7 +112,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         style={{ right: `${rightPosition}px` }}
       >
         <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <h3 className="font-medium truncate">Chat with {targetUser}</h3>
+          <h3 className="font-medium truncate">
+            Chat with {targetUser} 
+            {unreadCount > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadCount}</span>}
+          </h3>
           <Button 
             variant="ghost" 
             size="icon" 
