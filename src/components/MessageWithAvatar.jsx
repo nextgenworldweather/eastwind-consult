@@ -1,6 +1,6 @@
 import React from 'react';
 import Avatar from 'react-avatar';
-import '/src/styles/components/ui/MessageWithAvatar.css';
+import '/src/styles/components/MessageWithAvatar.css';
 
 const MessageWithAvatar = ({ message, isSender }) => {
   return (
