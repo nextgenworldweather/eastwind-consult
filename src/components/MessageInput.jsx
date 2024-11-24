@@ -16,7 +16,7 @@ const ALLOWED_FILE_TYPES = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
 
-const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
+export function MessageInput({ onSendMessage, currentUser, chatId }) {
   const [message, setMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -130,17 +130,17 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
           size="icon"
           variant="ghost"
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="hover:bg-gray-100"
+          className="hover:bg-muted"
         >
           <Smile className="h-4 w-4" />
         </Button>
         {showEmojiPicker && (
           <div className="absolute bottom-full right-0 mb-2 z-50">
-            <div className="relative">
+            <div className="relative bg-background rounded-lg shadow-lg">
               <Button
                 size="icon"
                 variant="ghost"
-                className="absolute right-2 top-2 hover:bg-gray-100"
+                className="absolute right-2 top-2 hover:bg-muted"
                 onClick={() => setShowEmojiPicker(false)}
               >
                 <X className="h-4 w-4" />
@@ -177,7 +177,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
         variant="ghost"
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}
-        className="hover:bg-gray-100"
+        className="hover:bg-muted"
       >
         <Paperclip className="h-4 w-4" />
       </Button>
@@ -187,12 +187,11 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
         size="icon"
         variant="default"
         disabled={isUploading || !message.trim()}
-        className="bg-blue-500 hover:bg-blue-600 text-white"
       >
         <Send className="h-4 w-4" />
       </Button>
     </form>
   );
-};
+}
 
 export default MessageInput;

@@ -1,9 +1,10 @@
+// MessageWithAvatar.jsx
 import React from 'react';
 import Avatar from 'react-avatar';
 import moment from 'moment';
-import '/src/styles/components/MessageWithAvatar.css';
+import { cn } from "@/lib/utils";
 
-const MessageWithAvatar = ({ message, isSender }) => {
+export function MessageWithAvatar({ message, isSender }) {
   const renderMessageContent = () => {
     switch (message.type) {
       case 'image':
@@ -20,7 +21,7 @@ const MessageWithAvatar = ({ message, isSender }) => {
             href={message.fileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-blue-500 hover:underline"
+            className="flex items-center gap-2 text-primary hover:underline"
           >
             <svg
               className="w-4 h-4"
@@ -41,32 +42,43 @@ const MessageWithAvatar = ({ message, isSender }) => {
       default:
         return <div className="break-words">{message.text}</div>;
     }
-  }; 
+  };
 
   const formatTimestamp = (timestamp) => {
     return moment(timestamp).fromNow();
   };
 
   return (
-    <div className={`message ${isSender ? 'isSender' : ''}`}>
+    <div className={cn(
+      "flex items-start gap-2 px-4 py-2",
+      isSender && "flex-row-reverse"
+    )}>
       {!isSender && (
         <Avatar 
           name={message.sender} 
           size="40" 
           round={true} 
-          className="avatar"
+          className="flex-shrink-0"
         />
       )}
-      <div className={`messageContent ${isSender ? 'sender' : 'receiver'}`}>
+      <div className={cn(
+        "max-w-[70%] rounded-lg px-3 py-2",
+        isSender 
+          ? "bg-primary text-primary-foreground" 
+          : "bg-muted text-muted-foreground",
+      )}>
         {renderMessageContent()}
-        <div className="timestamp">
-          {message.timestamp
-            ? formatTimestamp(message.timestamp)
-            : 'Sending...'}
+        <div className={cn(
+          "text-xs mt-1",
+          isSender 
+            ? "text-primary-foreground/70" 
+            : "text-muted-foreground/70"
+        )}>
+          {message.timestamp ? formatTimestamp(message.timestamp) : 'Sending...'}
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default MessageWithAvatar;
