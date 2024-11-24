@@ -1,0 +1,42 @@
+.message {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+  
+  .message.isSender {
+    justify-content: flex-end;
+  }
+  
+  .message .avatar {
+    margin-right: 0.5rem;
+  }
+  
+  .message .messageContent {
+    max-width: 80%;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message.isSender .messageContent {
+    background-color: #3b82f6; /* blue for sender */
+    color: white;
+  }
+  
+  .message .messageContent {
+    background-color: #f3f4f6; /* light gray for receiver */
+    color: #111827;
+  }
+  
+  .message .timestamp {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    color: #9ca3af; /* gray for timestamp */
+  }
+  
+  .message.isSender .timestamp {
+    color: #d1d5db; /* lighter gray for sender timestamp */
+  }
+  

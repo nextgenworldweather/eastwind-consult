@@ -18,7 +18,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "uuid": "^9.0.1",
-    "lucide-react": "^0.39.0"
+    "lucide-react": "^0.39.0",
+    "react-toastify": "^9.0.5",  
+    "react-avatar": "^3.10.0"    
   },
   "devDependencies": {
     "@types/react": "^18.2.0",
