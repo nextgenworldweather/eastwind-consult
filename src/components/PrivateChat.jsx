@@ -38,7 +38,12 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   };
 
   const handleEmojiClick = (event, emojiObject) => {
-    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
+    const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
+    if (emoji) {
+      setMessage((prevMessage) => prevMessage + emoji);
+    } else {
+      console.error('Failed to append emoji:', emojiObject);
+    }
     setShowEmojiPicker(false);
   };
 
