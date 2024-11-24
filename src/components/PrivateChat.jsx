@@ -39,6 +39,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
+  const [lastMessageId, setLastMessageId] = useState(null);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -61,8 +62,11 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
 
         const lastMessage = messagesList[messagesList.length - 1];
         if (lastMessage && lastMessage.sender !== currentUser) {
-          notify(`New message from ${lastMessage.sender}`, 'info');
-          setChatVisible(true);
+          if (lastMessage.id !== lastMessageId) {
+            setLastMessageId(lastMessage.id);
+            notify(`New message from ${lastMessage.sender}`, 'info');
+            setChatVisible(true);
+          }
         }
       } else {
         setMessages([]);
@@ -73,7 +77,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser, chatVisible]);
+  }, [currentUser, targetUser, lastMessageId]);
 
   const sendPrivateMessage = (text) => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
