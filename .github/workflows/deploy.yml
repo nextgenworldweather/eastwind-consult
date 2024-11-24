@@ -29,7 +29,7 @@ jobs:
           npm install core-js-pure moment emoji-mart is-retina charenc is-buffer 
           
           # Install dev dependencies explicitly
-          npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
+          npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss mocha webpack
           
           # Install runtime dependencies explicitly
           npm install react-toastify firebase peerjs uuid lucide-react @mui/material @emotion/react @emotion/styled
