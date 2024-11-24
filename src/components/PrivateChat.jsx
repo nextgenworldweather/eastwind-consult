@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { db } from '../utils/firebase';
+import { db } from '/src/utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { Card, CardHeader, CardTitle, CardContent } from '/src/components/ui/card';
+import { Button } from '/src/components/ui/button';
+import { Input } from '/src/components/ui/input';
+import { ScrollArea } from '/src/components/ui/scroll-area';
 import { X, Send, Paperclip, Smile } from 'lucide-react';
 import { Notification, notify } from '/src/components/Notification';
 import { MessageWithAvatar } from '/src/components/MessageWithAvatar';
