@@ -1,236 +1,68 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import MessageList from './MessageList';
-import UserList from './UserList';
-import VideoConference from './VideoConference';
-import MessageInput from './MessageInput';
-import PrivateChat from './PrivateChat';
+import React, { useState, useEffect } from 'react';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, set, serverTimestamp, off } from 'firebase/database';
-import '../styles/components/ChatRoom.css';
+import { ref, onValue, push, get, query, orderByChild, serverTimestamp } from 'firebase/database';
+import MessageInput from './MessageInput';
 
-// Constants for Firebase paths
-const FIREBASE_PATHS = {
-  MESSAGES: 'messages',
-  USERS: 'users',
-  PRIVATE_CHATS: 'privateChats'
-};
-
-// Memoized components
-const MemoizedMessageList = memo(MessageList);
-const MemoizedUserList = memo(UserList);
-const MemoizedVideoConference = memo(VideoConference);
-const MemoizedPrivateChat = memo(PrivateChat);
-
-const ChatRoom = ({ username }) => {
+const PrivateChat = ({ currentUser, targetUser, onClose }) => {
   const [messages, setMessages] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [showVideo, setShowVideo] = useState(false);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [privateChats, setPrivateChats] = useState(new Map());
-
-  // Transform messages data
-  const transformMessages = useCallback((messagesData) => {
-    if (!messagesData) return [];
-    
-    return Object.entries(messagesData)
-      .map(([id, message]) => ({
-        id,
-        ...message,
-        timestamp: message.timestamp || Date.now(),
-      }))
-      .sort((a, b) => a.timestamp - b.timestamp);
-  }, []);
-
-  // Transform users data
-  const transformUsers = useCallback((usersData) => {
-    if (!usersData) return [];
-    return Object.entries(usersData)
-      .filter(([_, userData]) => userData.online)
-      .map(([userId]) => userId);
-  }, []);
-
-  // Handle starting a private chat
-  const handleStartPrivateChat = useCallback((targetUser) => {
-    if (targetUser === username) return;
-    
-    setPrivateChats(prev => {
-      const newChats = new Map(prev);
-      if (!newChats.has(targetUser)) {
-        newChats.set(targetUser, true);
-      }
-      return newChats;
-    });
-  }, [username]);
-
-  // Handle closing a private chat
-  const handleClosePrivateChat = useCallback((targetUser) => {
-    setPrivateChats(prev => {
-      const newChats = new Map(prev);
-      newChats.delete(targetUser);
-      return newChats;
-    });
-  }, []);
-
-  // Handle user presence
-  const handleUserPresence = useCallback(async () => {
-    if (!username) return;
-
-    const userRef = ref(db, `${FIREBASE_PATHS.USERS}/${username}`);
-    const userStatus = {
-      online: true,
-      lastSeen: serverTimestamp(),
-    };
-
-    try {
-      await set(userRef, userStatus);
-
-      window.addEventListener('beforeunload', () => {
-        set(userRef, {
-          ...userStatus,
-          online: false,
-        });
-      });
-    } catch (err) {
-      console.error('Error updating user presence:', err);
-      setError('Failed to update user status');
-    }
-  }, [username]);
+  const [chatId, setChatId] = useState(null);
 
   useEffect(() => {
-    if (!username) {
-      setError('Username is required');
-      return;
-    }
+    // Create a unique chat ID for the private conversation
+    const users = [currentUser, targetUser].sort();
+    const privateChatId = `private_${users[0]}_${users[1]}`;
+    setChatId(privateChatId);
 
-    const messagesRef = ref(db, FIREBASE_PATHS.MESSAGES);
-    const usersRef = ref(db, FIREBASE_PATHS.USERS);
-
-    const setupListeners = async () => {
-      try {
-        // Messages listener
-        onValue(messagesRef, (snapshot) => {
-          setMessages(transformMessages(snapshot.val()));
-          setIsLoading(false);
-        }, (error) => {
-          console.error('Messages listener error:', error);
-          setError('Failed to load messages');
-          setIsLoading(false);
-        });
-
-        // Users listener
-        onValue(usersRef, (snapshot) => {
-          setUsers(transformUsers(snapshot.val()));
-        }, (error) => {
-          console.error('Users listener error:', error);
-          setError('Failed to load users');
-        });
-
-        await handleUserPresence();
-      } catch (err) {
-        console.error('Setup error:', err);
-        setError('Failed to initialize chat');
-        setIsLoading(false);
+    // Listen for messages
+    const chatRef = ref(db, `privateChats/${privateChatId}/messages`);
+    const messagesQuery = query(chatRef, orderByChild('timestamp'));
+    
+    const unsubscribe = onValue(messagesQuery, (snapshot) => {
+      const messagesData = snapshot.val();
+      if (messagesData) {
+        const messagesList = Object.entries(messagesData).map(([id, message]) => ({
+          id,
+          ...message
+        }));
+        setMessages(messagesList);
       }
-    };
+    });
 
-    setupListeners();
+    return () => unsubscribe();
+  }, [currentUser, targetUser]);
 
-    return () => {
-      off(messagesRef);
-      off(usersRef);
-
-      if (username) {
-        set(ref(db, `${FIREBASE_PATHS.USERS}/${username}`), {
-          online: false,
-          lastSeen: serverTimestamp(),
-        }).catch(console.error);
-      }
-    };
-  }, [username, transformMessages, transformUsers, handleUserPresence]);
-
-  // Send message handler
-  const sendMessage = useCallback(async (text) => {
-    if (!text.trim()) return;
-
-    try {
-      const messagesRef = ref(db, FIREBASE_PATHS.MESSAGES);
-      await push(messagesRef, {
-        text: text.trim(),
-        username,
-        timestamp: serverTimestamp(),
-      });
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setError('Failed to send message');
-    }
-  }, [username]);
-
-  // Toggle video handler
-  const toggleVideo = useCallback(() => {
-    setShowVideo(prev => !prev);
-  }, []);
-
-  if (error) {
-    return (
-      <div className="chat-room-error">
-        <p>Error: {error}</p>
-        <button onClick={() => setError(null)}>Retry</button>
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return <div className="chat-room-loading">Loading...</div>;
-  }
+  const sendPrivateMessage = (text) => {
+    const messageRef = ref(db, `privateChats/${chatId}/messages`);
+    push(messageRef, {
+      text,
+      sender: currentUser,
+      receiver: targetUser,
+      timestamp: serverTimestamp()
+    });
+  };
 
   return (
-    <div className="chat-room">
-      <div className="chat-container">
-        <MemoizedUserList 
-          users={users} 
-          currentUser={username}
-          onUserClick={handleStartPrivateChat}
-        />
-        <div className="chat-main">
-          <MemoizedMessageList 
-            messages={messages} 
-            currentUser={username}
-          />
-          <MessageInput 
-            onSendMessage={sendMessage} 
-            disabled={!username}
-          />
-        </div>
+    <div className="private-chat">
+      <div className="private-chat-header">
+        <h3>Chat with {targetUser}</h3>
+        <button onClick={onClose}>×</button>
       </div>
-      
-      <div className="private-chats-container">
-        {Array.from(privateChats).map(([targetUser]) => (
-          <MemoizedPrivateChat
-            key={targetUser}
-            currentUser={username}
-            targetUser={targetUser}
-            onClose={() => handleClosePrivateChat(targetUser)}
-          />
+      <div className="private-chat-messages">
+        {messages.map((message) => (
+          <div 
+            key={message.id} 
+            className={`private-message ${message.sender === currentUser ? 'sent' : 'received'}`}
+          >
+            <div className="message-content">{message.text}</div>
+            <div className="message-time">
+              {new Date(message.timestamp).toLocaleTimeString()}
+            </div>
+          </div>
         ))}
       </div>
-      
-      {showVideo && (
-        <MemoizedVideoConference 
-          username={username} 
-          onError={(err) => setError(err.message)}
-        />
-      )}
-      
-      <button 
-        className="video-toggle-btn"
-        onClick={toggleVideo}
-        aria-label={showVideo ? 'Hide Video' : 'Show Video'}
-      >
-        {showVideo ? 'Hide Video' : 'Show Video'}
-      </button>
+      <MessageInput onSendMessage={sendPrivateMessage} />
     </div>
   );
 };
 
-export default memo(ChatRoom);
+export default PrivateChat;
