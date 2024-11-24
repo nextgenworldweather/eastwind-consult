@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, get, query, orderByChild, serverTimestamp } from 'firebase/database';
+import { ref, onValue, push, query, orderByChild, serverTimestamp } from 'firebase/database';
 import MessageInput from './MessageInput';
 
 const PrivateChat = ({ currentUser, targetUser, onClose }) => {
@@ -25,6 +25,8 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
           ...message
         }));
         setMessages(messagesList);
+      } else {
+        setMessages([]); // If no messages, set an empty array
       }
     });
 
@@ -38,6 +40,12 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
       sender: currentUser,
       receiver: targetUser,
       timestamp: serverTimestamp()
+    })
+    .then(() => {
+      console.log('Message sent:', text);
+    })
+    .catch((error) => {
+      console.error('Error sending message:', error);
     });
   };
 
