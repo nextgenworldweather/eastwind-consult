@@ -65,7 +65,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
           if (lastMessage.id !== lastMessageId) {
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true);
+            setChatVisible(true); // Ensure chat is set to visible
           }
         }
       } else {
