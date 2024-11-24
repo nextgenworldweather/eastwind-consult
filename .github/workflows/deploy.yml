@@ -23,7 +23,7 @@ jobs:
       # Install dependencies more efficiently
       - name: Install Dependencies
         run: |
-          rm -rf node_modules
+          rm -rf node_modules/*
           npm install
           npm ci
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
