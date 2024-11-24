@@ -1,30 +1,32 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
-import Card from '/src/components/ui/card';
-import Button from '/src/components/ui/button';
-import Input from '/src/components/ui/input';
-import ScrollArea from '/src/components/ui/scroll-area';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { X, Send, Paperclip, Smile } from 'lucide-react';
-import Notification, { notify } from '/src/components/Notification';
-import MessageWithAvatar from '/src/components/MessageWithAvatar';
+import { Notification, notify } from '/src/components/Notification';
+import { MessageWithAvatar } from '/src/components/MessageWithAvatar';
 import EmojiPicker from 'emoji-picker-react';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [typingTimeout, setTypingTimeout] = useState(null);
+
+  const updateTypingStatus = useCallback((isTyping) => {
+    set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), isTyping);
+  }, [chatId, currentUser]);
 
   const handleTyping = (e) => {
     setMessage(e.target.value);
-    if (!isTyping) {
-      setIsTyping(true);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
-    }
-    if (e.target.value === '') {
-      setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
-    }
+    
+    if (typingTimeout) clearTimeout(typingTimeout);
+    
+    updateTypingStatus(true);
+    const timeout = setTimeout(() => updateTypingStatus(false), 2000);
+    setTypingTimeout(timeout);
   };
 
   const handleSubmit = (e) => {
@@ -32,55 +34,77 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     if (message.trim()) {
       onSendMessage(message.trim());
       setMessage('');
-      setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
+      updateTypingStatus(false);
+      if (typingTimeout) clearTimeout(typingTimeout);
     }
   };
 
   const handleEmojiClick = (event, emojiObject) => {
-    setMessage((prevMessage) => prevMessage + emojiObject.emoji);
+    setMessage(prev => prev + emojiObject.emoji);
     setShowEmojiPicker(false);
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file.size <= 5 * 1024 * 1024) { // 5MB limit
       const reader = new FileReader();
-      reader.onload = () => {
-        onSendMessage(reader.result, 'file');
-      };
+      reader.onload = () => onSendMessage(reader.result, 'file');
       reader.readAsDataURL(file);
+    } else if (file) {
+      notify('File size must be less than 5MB', 'error');
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (typingTimeout) clearTimeout(typingTimeout);
+      updateTypingStatus(false);
+    };
+  }, [typingTimeout, updateTypingStatus]);
+
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      <div style={{ position: 'relative' }}>
-        <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+      <div className="relative">
+        <Button 
+          type="button" 
+          size="icon"
+          variant="ghost" 
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+        >
           <Smile className="h-4 w-4" />
         </Button>
         {showEmojiPicker && (
-          <div style={{ position: 'absolute', bottom: '100%' }}>
+          <div className="absolute bottom-full right-0 z-50">
             <EmojiPicker onEmojiClick={handleEmojiClick} />
           </div>
         )}
       </div>
+      
       <Input
         value={message}
         onChange={handleTyping}
         placeholder="Type your message..."
         className="flex-1"
       />
+      
       <input
         type="file"
         id="file-input"
-        style={{ display: 'none' }}
+        className="hidden"
         onChange={handleFileChange}
+        accept="image/*,.pdf,.doc,.docx"
       />
-      <Button type="button" size="icon" onClick={() => document.getElementById('file-input').click()}>
+      
+      <Button 
+        type="button" 
+        size="icon"
+        variant="ghost"
+        onClick={() => document.getElementById('file-input').click()}
+      >
         <Paperclip className="h-4 w-4" />
       </Button>
-      <Button type="submit" size="icon">
+      
+      <Button type="submit" size="icon" variant="default">
         <Send className="h-4 w-4" />
       </Button>
     </form>
@@ -91,7 +115,6 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
-  const [lastMessageId, setLastMessageId] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
 
@@ -108,28 +131,17 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
       const messagesData = snapshot.val();
       if (messagesData) {
         const messagesList = Object.entries(messagesData)
-          .map(([id, message]) => ({
-            id,
-            ...message
-          }))
+          .map(([id, message]) => ({ id, ...message }))
           .sort((a, b) => a.timestamp - b.timestamp);
+          
         setMessages(messagesList);
 
         const lastMessage = messagesList[messagesList.length - 1];
-        if (lastMessage && lastMessage.sender !== currentUser) {
-          if (lastMessage.id !== lastMessageId) {
-            setLastMessageId(lastMessage.id);
-            setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
-            notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true); // Ensure chat is set to visible
-          }
+        if (lastMessage?.sender !== currentUser && !chatVisible) {
+          setUnreadMessages(prev => [...prev, lastMessage.id]);
+          notify(`New message from ${targetUser}`, 'info');
         }
-      } else {
-        setMessages([]);
       }
-    }, (error) => {
-      console.error('Error loading messages:', error);
-      notify('Failed to load messages', 'error');
     });
 
     const unsubscribeTyping = onValue(typingRef, (snapshot) => {
@@ -140,9 +152,9 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
       unsubscribeMessages();
       unsubscribeTyping();
     };
-  }, [currentUser, targetUser, lastMessageId, chatVisible]);
+  }, [currentUser, targetUser, chatVisible]);
 
-  const sendPrivateMessage = (text, type = 'text') => {
+  const sendPrivateMessage = useCallback((text, type = 'text') => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
     push(messageRef, {
       text,
@@ -150,67 +162,88 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
       sender: currentUser,
       receiver: targetUser,
       timestamp: serverTimestamp()
-    })
-    .catch((error) => {
-      console.error('Error sending message:', error);
-      notify('Failed to send message', 'error');
-    });
+    }).catch(() => notify('Failed to send message', 'error'));
+  }, [chatId, currentUser, targetUser]);
+
+  const handleClose = () => {
+    onClose();
+    setChatVisible(false);
+    setUnreadMessages([]);
   };
 
-  const handleOpenChat = () => {
-    setChatVisible(true);
-    setUnreadMessages([]); // Reset unread messages when chat is opened
-  };
-
-  // Calculate right position based on chat window index
-  const rightPosition = 20 + (position * 320); // 320px = width + gap
+  const rightPosition = `${20 + (position * 320)}px`;
 
   return (
     <>
       <Card 
-        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
-        style={{ right: `${rightPosition}px` }}
+        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg transition-all duration-300 ease-in-out ${
+          chatVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+        style={{ right: rightPosition }}
       >
-        <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-          <h3 className="font-medium truncate">
-            Chat with {targetUser} 
-            {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
-          </h3>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-white hover:bg-blue-400/20"
-            onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        <CardHeader className="p-4 bg-gradient-to-r from-blue-500 to-blue-600">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-white text-sm font-medium flex items-center gap-2">
+              {targetUser}
+              {unreadMessages.length > 0 && (
+                <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                  {unreadMessages.length}
+                </span>
+              )}
+            </CardTitle>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-white hover:bg-blue-400/20"
+              onClick={handleClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
 
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map((message) => {
-              const isSender = message.sender === currentUser;
-              return (
+        <CardContent className="flex-1 p-0">
+          <ScrollArea className="h-full">
+            <div className="p-4 space-y-4">
+              {messages.map((message) => (
                 <MessageWithAvatar 
                   key={message.id}
                   message={message}
-                  isSender={isSender}
+                  isSender={message.sender === currentUser}
                 />
-              );
-            })}
-            {isTyping && (
-              <div className="typingIndicator">
-                {`${targetUser} is typing...`}
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+              ))}
+              {isTyping && (
+                <div className="text-sm text-gray-500 italic">
+                  {targetUser} is typing...
+                </div>
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
 
-        <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
+        <MessageInput 
+          onSendMessage={sendPrivateMessage}
+          currentUser={currentUser}
+          chatId={chatId}
+        />
       </Card>
 
-      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
-        Open Chat with {targetUser}
+      <Button
+        onClick={() => {
+          setChatVisible(true);
+          setUnreadMessages([]);
+        }}
+        className={`fixed bottom-10 bg-blue-500 hover:bg-blue-600 transition-all duration-300 ${
+          chatVisible ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        }`}
+        style={{ right: rightPosition }}
+      >
+        Chat with {targetUser}
+        {unreadMessages.length > 0 && (
+          <span className="ml-2 bg-red-500 px-2 py-1 rounded-full text-xs">
+            {unreadMessages.length}
+          </span>
+        )}
       </Button>
 
       <Notification />
