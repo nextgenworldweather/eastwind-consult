@@ -35,18 +35,12 @@ const MessageInput = ({ onSendMessage }) => {
   );
 };
 
-const PrivateChat = ({ currentUser, targetUser, onClose, position = 0, isOpenFromMessage = false }) => {
+const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
-  const [chatVisible, setChatVisible] = useState(isOpenFromMessage);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  // Handle initial open state from message click
-  useEffect(() => {
-    if (isOpenFromMessage) {
-      setChatVisible(true);
-    }
-  }, [isOpenFromMessage]);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [lastMessageId, setLastMessageId] = useState(null);
+  const [unreadMessages, setUnreadMessages] = useState([]);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -65,31 +59,29 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0, isOpenFro
             ...message
           }))
           .sort((a, b) => a.timestamp - b.timestamp);
-
-        const lastMessage = messagesList[messagesList.length - 1];
-        const previousLastMessage = messages[messages.length - 1];
-
         setMessages(messagesList);
 
-        if (lastMessage && 
-            lastMessage.sender !== currentUser && 
-            (!previousLastMessage || lastMessage.id !== previousLastMessage.id)) {
-          notify(`New message from ${lastMessage.sender}`, 'info');
-          if (!chatVisible) {
-            setUnreadCount(prev => prev + 1);
+        const lastMessage = messagesList[messagesList.length - 1];
+        if (lastMessage && lastMessage.sender !== currentUser) {
+          if (lastMessage.id !== lastMessageId) {
+            setLastMessageId(lastMessage.id);
+            setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
+            notify(`New message from ${lastMessage.sender}`, 'info');
+            setChatVisible(true); // Ensure chat is set to visible
           }
         }
       } else {
         setMessages([]);
       }
+    }, (error) => {
+      console.error('Error loading messages:', error);
+      notify('Failed to load messages', 'error');
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser]);
+  }, [currentUser, targetUser, lastMessageId, chatVisible]);
 
   const sendPrivateMessage = (text) => {
-    if (!chatId) return;
-    
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
     push(messageRef, {
       text,
@@ -105,68 +97,54 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0, isOpenFro
 
   const handleOpenChat = () => {
     setChatVisible(true);
-    setUnreadCount(0);
+    setUnreadMessages([]); // Reset unread messages when chat is opened
   };
 
-  const handleCloseChat = () => {
-    setChatVisible(false);
-    onClose();
-  };
-
-  const rightPosition = 20 + (position * 320);
+  // Calculate right position based on chat window index
+  const rightPosition = 20 + (position * 320); // 320px = width + gap
 
   return (
     <>
-      {/* Chat Window */}
-      {chatVisible && (
-        <Card 
-          className="fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden"
-          style={{ right: `${rightPosition}px` }}
-        >
-          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <h3 className="font-medium truncate">Chat with {targetUser}</h3>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-blue-400/20"
-              onClick={handleCloseChat}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+      <Card 
+        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
+        style={{ right: `${rightPosition}px` }}
+      >
+        <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <h3 className="font-medium truncate">
+            Chat with {targetUser} 
+            {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
+          </h3>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-blue-400/20"
+            onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
 
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message) => (
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message) => {
+              const isSender = message.sender === currentUser;
+              return (
                 <MessageWithAvatar 
                   key={message.id}
                   message={message}
-                  isSender={message.sender === currentUser}
+                  isSender={isSender}
                 />
-              ))}
-            </div>
-          </ScrollArea>
+              );
+            })}
+          </div>
+        </ScrollArea>
 
-          <MessageInput onSendMessage={sendPrivateMessage} />
-        </Card>
-      )}
+        <MessageInput onSendMessage={sendPrivateMessage} />
+      </Card>
 
-      {/* Chat Button */}
-      <div 
-        onClick={handleOpenChat}
-        className="fixed bottom-10 right-10 cursor-pointer"
-      >
-        <Button 
-          className="bg-blue-500 text-white p-2 rounded flex items-center gap-2"
-        >
-          Chat with {targetUser}
-          {unreadCount > 0 && (
-            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
-              {unreadCount}
-            </span>
-          )}
-        </Button>
-      </div>
+      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
+        Open Chat with {targetUser}
+      </Button>
 
       <Notification />
     </>
