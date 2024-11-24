@@ -40,7 +40,6 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
   const [lastMessageId, setLastMessageId] = useState(null);
-  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -64,12 +63,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         const lastMessage = messagesList[messagesList.length - 1];
         if (lastMessage && lastMessage.sender !== currentUser) {
           if (lastMessage.id !== lastMessageId) {
+            console.log('New message received:', lastMessage);
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
-            // Increment unread count when chat is not visible
-            if (!chatVisible) {
-              setUnreadCount(prev => prev + 1);
-            }
+            setChatVisible(true); // Ensure chat is set to visible
           }
         }
       } else {
@@ -81,7 +78,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser, lastMessageId, chatVisible]);
+  }, [currentUser, targetUser, lastMessageId]);
 
   const sendPrivateMessage = (text) => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
@@ -98,13 +95,8 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   };
 
   const handleOpenChat = () => {
+    console.log('Chat manually opened');
     setChatVisible(true);
-    setUnreadCount(0); // Reset unread count when opening chat
-  };
-
-  const handleCloseChat = () => {
-    onClose();
-    setChatVisible(false);
   };
 
   // Calculate right position based on chat window index
@@ -122,7 +114,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             variant="ghost" 
             size="icon" 
             className="text-white hover:bg-blue-400/20"
-            onClick={handleCloseChat}
+            onClick={() => { onClose(); setChatVisible(false); }}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -146,16 +138,8 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         <MessageInput onSendMessage={sendPrivateMessage} />
       </Card>
 
-      <Button 
-        onClick={handleOpenChat} 
-        className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded flex items-center gap-2"
-      >
-        Chat with {targetUser}
-        {unreadCount > 0 && (
-          <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1">
-            {unreadCount}
-          </span>
-        )}
+      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
+        Open Chat with {targetUser}
       </Button>
 
       <Notification />
