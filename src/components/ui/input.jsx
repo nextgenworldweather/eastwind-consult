@@ -1,5 +1,5 @@
 import React from 'react';
-import '/src/styles/components/ui/input.css';
+import 'src/styles/components/ui/input.css';
 
 const Input = ({ className, ...props }) => {
   return (
