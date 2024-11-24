@@ -121,7 +121,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             setLastMessageId(lastMessage.id);
             setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
             notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true); // Ensure chat is set to visible g
+            setChatVisible(true); // Ensure chat is set to visible
           }
         }
       } else {
