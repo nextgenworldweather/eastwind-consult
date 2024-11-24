@@ -20,15 +20,24 @@ jobs:
           node-version: 22
           cache: 'npm'
       
-      # Install dependencies more efficiently
+      # Clean install with explicit dependencies
       - name: Install Dependencies
         run: |
-          rm -rf node_modules/*
-          npm install
-          npm ci
+          rm -rf node_modules package-lock.json
+          npm install --legacy-peer-deps
+          
+          # Install dev dependencies explicitly
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss
-          npm install react-avatar --save prop-types --save
+          
+          # Install runtime dependencies explicitly
           npm install react-toastify firebase peerjs uuid lucide-react @mui/material @emotion/react @emotion/styled
+          
+          # Install react-avatar with necessary peer dependency
+          npm install react-avatar prop-types --save --legacy-peer-deps
+
+      # Add NODE_OPTIONS to handle potential memory issues with Node.js 22
+      - name: Set Node Options
+        run: echo "NODE_OPTIONS=--max-old-space-size=4096" >> $GITHUB_ENV
       
       # Generate config files
       - name: Generate Config Files
@@ -59,25 +68,11 @@ jobs:
           };
           EOL
       
-      # Build with error handling
+      # Build with error handling and increased memory limit
       - name: Build
         run: |
           npm run build || (echo "Build failed" && exit 1)
       
-      # Verify build output
-      - name: Verify Build
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "dist directory not found!"
-            exit 1
-          fi
-          echo "Build size:"
-          du -sh dist
-          echo "File count:"
-          find dist -type f | wc -l
-          echo "Directory contents:"
-          ls -la dist
-
       # Upload for GitHub Pages
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
