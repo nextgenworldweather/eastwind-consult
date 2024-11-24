@@ -5,13 +5,16 @@ import Card from '/src/components/ui/card';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
 import ScrollArea from '/src/components/ui/scroll-area';
-import { X, Send } from 'lucide-react';
+import { X, Send, Paperclip, Smile } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
+import { Picker } from 'emoji-mart';
+import 'emoji-mart/css/emoji-mart.css';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleTyping = (e) => {
     setMessage(e.target.value);
@@ -35,14 +38,43 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     }
   };
 
+  const handleEmojiSelect = (emoji) => {
+    setMessage((prevMessage) => prevMessage + emoji.native);
+    setShowEmojiPicker(false);
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        onSendMessage(reader.result, 'file');
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
+      <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+        <Smile className="h-4 w-4" />
+      </Button>
+      {showEmojiPicker && <Picker onSelect={handleEmojiSelect} />}
       <Input
         value={message}
         onChange={handleTyping}
         placeholder="Type your message..."
         className="flex-1"
       />
+      <input
+        type="file"
+        id="file-input"
+        style={{ display: 'none' }}
+        onChange={handleFileChange}
+      />
+      <Button type="button" size="icon" onClick={() => document.getElementById('file-input').click()}>
+        <Paperclip className="h-4 w-4" />
+      </Button>
       <Button type="submit" size="icon">
         <Send className="h-4 w-4" />
       </Button>
@@ -105,10 +137,11 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     };
   }, [currentUser, targetUser, lastMessageId, chatVisible]);
 
-  const sendPrivateMessage = (text) => {
+  const sendPrivateMessage = (text, type = 'text') => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
     push(messageRef, {
       text,
+      type,
       sender: currentUser,
       receiver: targetUser,
       timestamp: serverTimestamp()
