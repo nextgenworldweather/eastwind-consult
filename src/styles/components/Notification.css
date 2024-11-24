@@ -1,0 +1,33 @@
+/* Custom styles for Toast notifications */
+.Toastify__toast-container {
+    z-index: 9999;
+  }
+  
+  .Toastify__toast {
+    border-radius: 8px;
+  }
+  
+  .Toastify__toast--info {
+    background: #2196f3; /* Blue */
+    color: white;
+  }
+  
+  .Toastify__toast--success {
+    background: #4caf50; /* Green */
+    color: white;
+  }
+  
+  .Toastify__toast--warning {
+    background: #ff9800; /* Orange */
+    color: white;
+  }
+  
+  .Toastify__toast--error {
+    background: #f44336; /* Red */
+    color: white;
+  }
+  
+  .Toastify__close-button {
+    color: white;
+  }
+  
