@@ -26,7 +26,7 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install --legacy-peer-deps
 
-          npm install core-js-pure
+          npm install core-js-pure moment
           
           # Install dev dependencies explicitly
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss

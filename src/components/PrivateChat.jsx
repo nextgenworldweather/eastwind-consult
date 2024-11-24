@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, query, orderByChild, serverTimestamp } from 'firebase/database';
+import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
 import Card from '/src/components/ui/card';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
@@ -9,14 +9,29 @@ import { X, Send } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
 
-const MessageInput = ({ onSendMessage }) => {
+const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleTyping = (e) => {
+    setMessage(e.target.value);
+    if (!isTyping) {
+      setIsTyping(true);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
+    }
+    if (e.target.value === '') {
+      setIsTyping(false);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim()) {
       onSendMessage(message.trim());
       setMessage('');
+      setIsTyping(false);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
@@ -24,7 +39,7 @@ const MessageInput = ({ onSendMessage }) => {
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
       <Input
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleTyping}
         placeholder="Type your message..."
         className="flex-1"
       />
@@ -41,6 +56,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   const [chatVisible, setChatVisible] = useState(false);
   const [lastMessageId, setLastMessageId] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -48,9 +64,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     setChatId(privateChatId);
 
     const chatRef = ref(db, `privateChats/${privateChatId}/messages`);
+    const typingRef = ref(db, `privateChats/${privateChatId}/typing/${targetUser}`);
     const messagesQuery = query(chatRef, orderByChild('timestamp'));
 
-    const unsubscribe = onValue(messagesQuery, (snapshot) => {
+    const unsubscribeMessages = onValue(messagesQuery, (snapshot) => {
       const messagesData = snapshot.val();
       if (messagesData) {
         const messagesList = Object.entries(messagesData)
@@ -78,7 +95,14 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
       notify('Failed to load messages', 'error');
     });
 
-    return () => unsubscribe();
+    const unsubscribeTyping = onValue(typingRef, (snapshot) => {
+      setIsTyping(snapshot.val() || false);
+    });
+
+    return () => {
+      unsubscribeMessages();
+      unsubscribeTyping();
+    };
   }, [currentUser, targetUser, lastMessageId, chatVisible]);
 
   const sendPrivateMessage = (text) => {
@@ -136,10 +160,15 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
                 />
               );
             })}
+            {isTyping && (
+              <div className="typingIndicator">
+                {`${targetUser} is typing...`}
+              </div>
+            )}
           </div>
         </ScrollArea>
 
-        <MessageInput onSendMessage={sendPrivateMessage} />
+        <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
       </Card>
 
       <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">

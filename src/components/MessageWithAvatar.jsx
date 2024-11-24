@@ -1,8 +1,13 @@
 import React from 'react';
 import Avatar from 'react-avatar';
+import moment from 'moment';
 import '/src/styles/components/MessageWithAvatar.css';
 
 const MessageWithAvatar = ({ message, isSender }) => {
+  const formatTimestamp = (timestamp) => {
+    return moment(timestamp).fromNow();
+  };
+
   return (
     <div className={`message ${isSender ? 'isSender' : ''}`}>
       {!isSender && (
@@ -19,10 +24,7 @@ const MessageWithAvatar = ({ message, isSender }) => {
         <div className="break-words">{message.text}</div>
         <div className="timestamp">
           {message.timestamp
-            ? new Date(message.timestamp).toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-              })
+            ? formatTimestamp(message.timestamp)
             : 'Sending...'}
         </div>
       </div>
