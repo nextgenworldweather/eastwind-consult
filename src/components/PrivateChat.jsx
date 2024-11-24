@@ -4,7 +4,7 @@ import { ref, onValue, push, query, orderByChild, serverTimestamp } from 'fireba
 import Card from '/src/components/ui/card';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
-import ScrollArea from '/src/components/ui/scroll-area';
+import ScrollArea from '/src/components/scroll-area';
 import { X, Send } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
@@ -67,10 +67,8 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             console.log('New message received:', lastMessage);
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
-            if (!chatVisible) {
-              setChatVisible(true); // Ensure chat is set to visible
-              setUnreadCount((prevCount) => prevCount + 1); // Increment unread count
-            }
+            setChatVisible(true); // Ensure chat is set to visible
+            setUnreadCount((prevCount) => prevCount + 1); // Increment unread count
           }
         }
       } else {
