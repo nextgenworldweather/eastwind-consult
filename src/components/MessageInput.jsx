@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ref, set } from 'firebase/database';
-import { Picker } from 'emoji-mart';
-import 'emoji-mart/css/emoji-mart.css';
+import { EmojiPicker } from 'react-emoji-picker';
+import 'react-emoji-picker/css/style.css';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
 import { Send, Paperclip, Smile } from 'lucide-react';
@@ -54,7 +54,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
       <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
         <Smile className="h-4 w-4" />
       </Button>
-      {showEmojiPicker && <Picker onSelect={handleEmojiSelect} />}
+      {showEmojiPicker && <EmojiPicker onEmojiClick={handleEmojiSelect} />}
       <Input
         value={message}
         onChange={handleTyping}
