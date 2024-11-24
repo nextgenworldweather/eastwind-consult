@@ -99,7 +99,6 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   };
 
   const handleOpenChat = () => {
-    console.log('Chat manually opened');
     setChatVisible(true);
     setUnreadMessages([]); // Reset unread messages when chat is opened
   };
