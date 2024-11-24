@@ -10,10 +10,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: resolve(__dirname, 'index.html'), // Entry point
-      external: [
-        'core-js-pure/stable/object/assign.js',
-        'emoji-mart/css/emoji-mart.css' // Externalize emoji-mart CSS
-      ],
     },
   },
   resolve: {
