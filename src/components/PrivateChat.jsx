@@ -67,8 +67,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             console.log('New message received:', lastMessage);
             setLastMessageId(lastMessage.id);
             notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true); // Ensure chat is set to visible
-            setUnreadCount((prevCount) => prevCount + 1); // Increment unread count
+            if (!chatVisible) {
+              setChatVisible(true); // Ensure chat is set to visible
+              setUnreadCount((prevCount) => prevCount + 1); // Increment unread count
+            }
           }
         }
       } else {
@@ -80,7 +82,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     });
 
     return () => unsubscribe();
-  }, [currentUser, targetUser, lastMessageId]);
+  }, [currentUser, targetUser, lastMessageId, chatVisible]);
 
   const sendPrivateMessage = (text) => {
     const messageRef = ref(db, `privateChats/${chatId}/messages`);
@@ -120,7 +122,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             variant="ghost" 
             size="icon" 
             className="text-white hover:bg-blue-400/20"
-            onClick={() => { onClose(); setChatVisible(false); }}
+            onClick={() => { onClose(); setChatVisible(false); setUnreadCount(0); }}
           >
             <X className="h-4 w-4" />
           </Button>
