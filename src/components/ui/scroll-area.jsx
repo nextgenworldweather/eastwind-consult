@@ -1,5 +1,5 @@
 import React from 'react';
-import 'src/styles/components/ui/scroll-area.css';
+import '/src/styles/components/ui/scroll-area.css';
 
 const ScrollArea = ({ children, className, ...props }) => {
   return (

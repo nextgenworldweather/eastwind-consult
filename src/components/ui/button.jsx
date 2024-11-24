@@ -1,5 +1,5 @@
 import React from 'react';
-import 'src/styles/components/ui/button.css';
+import '/src/styles/components/ui/button.css';
 
 const Button = ({ children, variant = 'default', size = 'md', className, ...props }) => {
   return (

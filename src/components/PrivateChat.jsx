@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, query, orderByChild, serverTimestamp } from 'firebase/database';
-import Card from 'src/components/ui/card';
-import Button from 'src/components/ui/button';
-import Input from 'src/components/ui/input';
-import ScrollArea from 'src/components/ui/scroll-area';
+import Card from '/src/components/ui/card';
+import Button from '/src/components/ui/button';
+import Input from '/src/components/ui/input';
+import ScrollArea from '/src/components/ui/scroll-area';
 import { X, Send } from 'lucide-react';
 
 const MessageInput = ({ onSendMessage }) => {
