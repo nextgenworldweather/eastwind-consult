@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { ref, set } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { db, storage } from '../utils/firebase';
+import { Smile, Send, Paperclip } from 'lucide-react';
 import EmojiPicker from 'emoji-picker-react';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
-import { Send, Paperclip, Smile } from 'lucide-react';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
@@ -16,35 +14,22 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     setMessage(e.target.value);
     if (!isTyping) {
       setIsTyping(true);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
     }
     if (e.target.value === '') {
       setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim()) {
-      onSendMessage(message.trim());
+      onSendMessage({ text: message.trim(), type: 'text' });
       setMessage('');
       setIsTyping(false);
-      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
-  
-    const handleEmojiClick = (event, emojiObject) => {
-        const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
-        if (emoji) {
-            setMessage((prevMessage) => prevMessage + emoji);
-        } else {
-            console.error('Failed to append emoji:', emojiObject);
-        }
-        setShowEmojiPicker(false);
-    };
-    
+  const handleEmojiClick = (event, emojiObject) => {
     const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
     if (emoji) {
       setMessage((prevMessage) => prevMessage + emoji);
@@ -54,46 +39,27 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     setShowEmojiPicker(false);
   };
 
-  
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const storageReference = storageRef(storage, `uploads/${file.name}`);
-            uploadBytes(storageReference, file).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((url) => {
-                    const fileMetadata = {
-                        text: file.name,
-                        fileUrl: url,
-                        type: 'file',
-                        sender: currentUser,
-                        timestamp: serverTimestamp(),
-                    };
-                    set(ref(db, `privateChats/${chatId}/messages`), fileMetadata);
-                }).catch((error) => {
-                    console.error('Error getting download URL:', error);
-                });
-            }).catch((error) => {
-                console.error('Error uploading file:', error);
-            });
-        }
-    };
-    
+  const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       const storageReference = storageRef(storage, `uploads/${file.name}`);
-      uploadBytes(storageReference, file).then((snapshot) => {
-        getDownloadURL(snapshot.ref).then((url) => {
-          onSendMessage({
-            text: file.name,
-            fileUrl: url,
-            type: 'file'
-          });
-        }).catch((error) => {
-          console.error('Error getting download URL:', error);
+      uploadBytes(storageReference, file)
+        .then((snapshot) => {
+          getDownloadURL(snapshot.ref)
+            .then((url) => {
+              onSendMessage({
+                text: file.name,
+                fileUrl: url,
+                type: 'file',
+              });
+            })
+            .catch((error) => {
+              console.error('Error getting download URL:', error);
+            });
+        })
+        .catch((error) => {
+          console.error('Error uploading file:', error);
         });
-      }).catch((error) => {
-        console.error('Error uploading file:', error);
-      });
     }
   };
 
