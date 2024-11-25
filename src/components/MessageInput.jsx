@@ -47,7 +47,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        onSendMessage(reader.result, 'file');
+        onSendMessage(reader.result, 'file', file.name);
       };
       reader.readAsDataURL(file);
     }
