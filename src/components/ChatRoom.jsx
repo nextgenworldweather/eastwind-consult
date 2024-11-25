@@ -5,7 +5,7 @@ import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
 import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
+import { ref, onValue, push, set, serverTimestamp, off } from 'firebase/database';
 import Notification, { notify } from './Notification';
 import '../styles/components/ChatRoom.css';
 
@@ -32,7 +32,6 @@ const ChatRoom = ({ username }) => {
   // Transform messages data
   const transformMessages = useCallback((messagesData) => {
     if (!messagesData) return [];
-    
     return Object.entries(messagesData)
       .map(([id, message]) => ({
         id,
@@ -52,11 +51,11 @@ const ChatRoom = ({ username }) => {
 
   // Handle private chat
   const openPrivateChat = useCallback((targetUser) => {
-    setPrivateChats(prev => new Map(prev).set(targetUser, true));
+    setPrivateChats((prev) => new Map(prev).set(targetUser, true));
   }, []);
 
   const closePrivateChat = useCallback((targetUser) => {
-    setPrivateChats(prev => {
+    setPrivateChats((prev) => {
       const newChats = new Map(prev);
       newChats.delete(targetUser);
       return newChats;
@@ -106,16 +105,9 @@ const ChatRoom = ({ username }) => {
 
           // Update unread messages
           const lastMessage = transformedMessages[transformedMessages.length - 1];
-          if (lastMessage && lastMessage.sender !== username) {
+          if (lastMessage?.sender && lastMessage.sender !== username) {
             setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
-            
-    if (lastMessage && lastMessage.sender) {
-        notify(`New message from ${lastMessage.sender}`, 'info');
-    } else {
-        console.warn('Notification skipped: sender undefined');
-    }
-      notify('Notification skipped: sender undefined', 'info');
-
+            notify(`New message from ${lastMessage.sender}`, 'info');
           }
         }, (error) => {
           console.error('Messages listener error:', error);
@@ -173,7 +165,7 @@ const ChatRoom = ({ username }) => {
 
   // Toggle video handler
   const toggleVideo = useCallback(() => {
-    setShowVideo(prev => !prev);
+    setShowVideo((prev) => !prev);
   }, []);
 
   if (error) {
@@ -206,7 +198,6 @@ const ChatRoom = ({ username }) => {
           <MessageInput 
             onSendMessage={sendMessage} 
             currentUser={username}
-            chatId="chatroom"
           />
         </div>
       </div>
