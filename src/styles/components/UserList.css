@@ -36,6 +36,11 @@
 
 .user-status-indicator {
   margin-right: 8px;
+  font-size: 1.2em;
+}
+
+.user-name {
+  margin-left: 8px;
 }
 
 .private-chat-btn {
