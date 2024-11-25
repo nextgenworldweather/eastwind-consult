@@ -207,6 +207,7 @@ const ChatRoom = ({ username }) => {
             onSendMessage={sendMessage} 
             currentUser={username}
             chatId="chatroom"
+            toggleVideo={toggleVideo} // Pass the toggleVideo function here
           />
         </div>
       </div>
