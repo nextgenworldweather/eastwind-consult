@@ -14,7 +14,7 @@ const UserList = ({ users, currentUser }) => {
       <div className="user-list">
         <h3>Active Users</h3>
         <ul>
-          {users.map((user, index) => (
+          {users.map((user) => (
             user.username !== currentUser && (
               <li
                 key={user.username}
