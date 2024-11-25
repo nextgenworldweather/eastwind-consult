@@ -14,26 +14,25 @@ const UserList = ({ users, currentUser }) => {
       <div className="user-list">
         <h3>Active Users</h3>
         <ul>
-          {users.map((user) => (
-            user.username !== currentUser && (
+          {users
+            .filter(user => user.username !== currentUser)
+            .map((user) => (
               <li
                 key={user.username}
-                className={user.username === currentUser ? 'current-user' : ''}
-                onClick={() => startPrivateChat(user.username)}
+                onClick={() => startPrivateChat(user)}
               >
                 <span className={`user-status-indicator ${user.online ? 'online' : 'offline'}`}>
                   {user.online ? '🟢' : '🔴'}
                 </span>
                 <span className="user-name">{user.username}</span>
               </li>
-            )
-          ))}
+            ))}
         </ul>
       </div>
       {selectedUser && (
         <PrivateChat
           currentUser={currentUser}
-          targetUser={selectedUser}
+          targetUser={selectedUser.username}
           onClose={() => setSelectedUser(null)}
         />
       )}
