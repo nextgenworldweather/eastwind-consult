@@ -1,112 +1,93 @@
-import React, { useState, useEffect, useCallback, memo } from 'react';
+import React, { useState, useEffect } from 'react';
 import MessageList from './MessageList';
-import UserList from './UserList';
-import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
-import PrivateChat from './PrivateChat';
-import { db } from '../utils/firebase';
-import { ref, onValue, push, set, serverTimestamp, off } from 'firebase/database';
-import Notification from './Notification';
+import UserList from './UserList';
 import '../styles/components/ChatRoom.css';
+import { database } from '../firebaseConfig'; // Adjust based on your project structure
+import { ref, onValue, push, update } from 'firebase/database';
 
 const ChatRoom = ({ username }) => {
   const [messages, setMessages] = useState([]);
   const [users, setUsers] = useState([]);
-  const [showVideo, setShowVideo] = useState(false);
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [privateChatUser, setPrivateChatUser] = useState(null);
 
-  const transformMessages = useCallback((messagesData) => {
-    if (!messagesData) return [];
-    return Object.entries(messagesData).map(([id, message]) => ({
-      id,
-      ...message,
-      timestamp: message.timestamp || Date.now(),
-    }));
-  }, []);
-
-  const transformUsers = useCallback((usersData) => {
-    if (!usersData) return [];
-    return Object.entries(usersData).filter(([_, user]) => user.online).map(([id]) => id);
-  }, []);
-
+  // Fetch messages
   useEffect(() => {
-    const messagesRef = ref(db, 'messages');
-    const usersRef = ref(db, 'users');
-
-    const setupListeners = () => {
-      onValue(messagesRef, (snapshot) => {
-        setMessages(transformMessages(snapshot.val()));
-        setIsLoading(false);
-      }, (error) => {
-        console.error('Error loading messages:', error);
-        setError('Failed to load messages');
-      });
-
-      onValue(usersRef, (snapshot) => {
-        setUsers(transformUsers(snapshot.val()));
-      }, (error) => {
-        console.error('Error loading users:', error);
-        setError('Failed to load users');
-      });
-    };
-
-    setupListeners();
-
-    return () => {
-      off(messagesRef);
-      off(usersRef);
-    };
-  }, [transformMessages, transformUsers]);
-
-  const sendMessage = useCallback(async (text) => {
-    if (!text.trim()) return;
-    try {
-      const messagesRef = ref(db, 'messages');
-      await push(messagesRef, {
-        text: text.trim(),
-        username,
-        timestamp: serverTimestamp(),
-      });
-    } catch (error) {
-      console.error('Error sending message:', error);
-      setError('Failed to send message');
-    }
-  }, [username]);
-
-  const toggleVideo = useCallback(() => {
-    setShowVideo((prev) => !prev);
+    const messagesRef = ref(database, 'messages');
+    onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      const loadedMessages = data
+        ? Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }))
+        : [];
+      setMessages(loadedMessages);
+    });
   }, []);
 
-  if (error) {
-    return (
-      <div className="chat-room-error">
-        <p>Error: {error}</p>
-        <button onClick={() => setError(null)}>Retry</button>
-      </div>
-    );
-  }
+  // Fetch users
+  useEffect(() => {
+    const usersRef = ref(database, 'users');
+    onValue(usersRef, (snapshot) => {
+      const data = snapshot.val();
+      const loadedUsers = data
+        ? Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }))
+        : [];
+      setUsers(loadedUsers);
+    });
+  }, []);
 
-  if (isLoading) {
-    return <div className="chat-room-loading">Loading...</div>;
-  }
+  // Handle sending messages
+  const handleSendMessage = (text) => {
+    const newMessage = {
+      username,
+      text,
+      timestamp: Date.now(),
+    };
+    const messagesRef = ref(database, 'messages');
+    push(messagesRef, newMessage);
+  };
+
+  // Handle private chat
+  const handleUserClick = (clickedUser) => {
+    if (clickedUser !== username) {
+      setPrivateChatUser(clickedUser);
+    }
+  };
+
+  const closePrivateChat = () => {
+    setPrivateChatUser(null);
+  };
 
   return (
     <div className="chat-room">
-      <div className="chat-container">
-        <UserList users={users} currentUser={username} />
-        <div className="chat-main">
-          <MessageList messages={messages} currentUser={username} />
-          <MessageInput onSendMessage={sendMessage} />
-        </div>
+      <div className="sidebar">
+        <UserList
+          users={users}
+          currentUser={username}
+          onUserClick={handleUserClick}
+        />
       </div>
-      {showVideo && <VideoConference username={username} />}
-      <button className="video-toggle-btn" onClick={toggleVideo}>
-        {showVideo ? 'Hide Video' : 'Show Video'}
-      </button>
-      <Notification />
+      <div className="chat-area">
+        {privateChatUser ? (
+          <div className="private-chat">
+            <h4>Private Chat with {privateChatUser}</h4>
+            <button onClick={closePrivateChat}>Close</button>
+            {/* Placeholder: Private Chat Messages */}
+          </div>
+        ) : (
+          <>
+            <MessageList messages={messages} />
+            <MessageInput onSendMessage={handleSendMessage} />
+          </>
+        )}
+      </div>
     </div>
   );
 };
 
-export default memo(ChatRoom);
+export default ChatRoom;
