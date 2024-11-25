@@ -7,7 +7,8 @@ import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
 import Notification, { notify } from './Notification';
-import { Video } from 'lucide-react'; 
+import { Video } from 'lucide-react';
+import Button from '/src/components/ui/button'; // Ensure Button is imported
 import '../styles/components/ChatRoom.css';
 
 // Constants for Firebase paths
