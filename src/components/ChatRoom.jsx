@@ -3,6 +3,7 @@ import MessageList from './MessageList';
 import UserList from './UserList';
 import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
+import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
 import Notification, { notify } from './Notification';
@@ -216,7 +217,7 @@ const ChatRoom = ({ username }) => {
         />
       )}
 
-      {/* Moved the show video button to the left side of the emoji button */}
+      {/* Move the show video button to the left side of the emoji button */}
       <div style={{ position: 'relative', display: 'inline-block', marginRight: '8px' }}>
         <Button type="button" size="icon" onClick={toggleVideo}>
           <Video className="h-4 w-4" />
