@@ -114,7 +114,8 @@ const ChatRoom = ({ username }) => {
     } else {
         console.warn('Notification skipped: sender undefined');
     }
-    , 'info');
+      notify('Notification skipped: sender undefined', 'info');
+
           }
         }, (error) => {
           console.error('Messages listener error:', error);
