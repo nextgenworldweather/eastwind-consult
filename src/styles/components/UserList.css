@@ -39,8 +39,18 @@
   font-size: 1.2em;
 }
 
+.user-status-indicator.online {
+  color: green;
+}
+
+.user-status-indicator.offline {
+  color: red;
+}
+
 .user-name {
   margin-left: 8px;
+  font-size: 1em;
+  color: black;
 }
 
 .private-chat-btn {

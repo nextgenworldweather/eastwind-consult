@@ -21,7 +21,7 @@ const UserList = ({ users, currentUser }) => {
                 className={user.username === currentUser ? 'current-user' : ''}
                 onClick={() => startPrivateChat(user.username)}
               >
-                <span className="user-status-indicator">
+                <span className={`user-status-indicator ${user.online ? 'online' : 'offline'}`}>
                   {user.online ? '🟢' : '🔴'}
                 </span>
                 <span className="user-name">{user.username}</span>
