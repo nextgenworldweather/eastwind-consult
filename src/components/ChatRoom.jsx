@@ -3,7 +3,7 @@ import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 import UserList from './UserList';
 import '../styles/components/ChatRoom.css';
-import { db } from '../firebase'; // Adjust based on your project structure
+import { db } from '/src/utils/firebase'; // Adjust based on your project structure
 import { ref, onValue, push, update } from 'firebase/database';
 
 const ChatRoom = ({ username }) => {
