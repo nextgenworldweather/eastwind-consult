@@ -7,6 +7,7 @@ import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
 import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
 import Notification, { notify } from './Notification';
+import { Video } from 'lucide-react'; // Added icon for the video button
 import '../styles/components/ChatRoom.css';
 
 // Constants for Firebase paths
@@ -215,27 +216,14 @@ const ChatRoom = ({ username }) => {
           onError={(err) => setError(err.message)}
         />
       )}
-      
-      <button 
-        className="video-toggle-btn"
-        onClick={toggleVideo}
-        aria-label={showVideo ? 'Hide Video' : 'Show Video'}
-      >
-        {showVideo ? 'Hide Video' : 'Show Video'}
-      </button>
 
-      {/* Private Chat Windows */}
-      {Array.from(privateChats.entries()).map(([targetUser, isOpen], index) => (
-        isOpen && (
-          <PrivateChat
-            key={targetUser}
-            currentUser={username}
-            targetUser={targetUser}
-            onClose={() => closePrivateChat(targetUser)}
-            position={index}
-          />
-        )
-      ))}
+      {/* Move the show video button to the left side of the emoji button */}
+      <div style={{ position: 'relative', display: 'inline-block', marginRight: '8px' }}>
+        <Button type="button" size="icon" onClick={toggleVideo}>
+          <Video className="h-4 w-4" />
+        </Button>
+      </div>
+
       <Notification />
     </div>
   );
