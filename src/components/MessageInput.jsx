@@ -34,7 +34,17 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     }
   };
 
-  const handleEmojiClick = (event, emojiObject) => {
+  
+    const handleEmojiClick = (event, emojiObject) => {
+        const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
+        if (emoji) {
+            setMessage((prevMessage) => prevMessage + emoji);
+        } else {
+            console.error('Failed to append emoji:', emojiObject);
+        }
+        setShowEmojiPicker(false);
+    };
+    
     const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
     if (emoji) {
       setMessage((prevMessage) => prevMessage + emoji);
@@ -44,7 +54,30 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     setShowEmojiPicker(false);
   };
 
-  const handleFileChange = (e) => {
+  
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const storageReference = storageRef(storage, `uploads/${file.name}`);
+            uploadBytes(storageReference, file).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                    const fileMetadata = {
+                        text: file.name,
+                        fileUrl: url,
+                        type: 'file',
+                        sender: currentUser,
+                        timestamp: serverTimestamp(),
+                    };
+                    set(ref(db, `privateChats/${chatId}/messages`), fileMetadata);
+                }).catch((error) => {
+                    console.error('Error getting download URL:', error);
+                });
+            }).catch((error) => {
+                console.error('Error uploading file:', error);
+            });
+        }
+    };
+    
     const file = e.target.files[0];
     if (file) {
       const storageReference = storageRef(storage, `uploads/${file.name}`);

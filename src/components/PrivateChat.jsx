@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { db, storage } from '../utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
@@ -42,8 +43,6 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
     if (emoji) {
       setMessage((prevMessage) => prevMessage + emoji);
-    } else {
-      console.error('Failed to append emoji:', emojiObject);
     }
     setShowEmojiPicker(false);
   };
@@ -135,8 +134,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
           if (lastMessage.id !== lastMessageId) {
             setLastMessageId(lastMessage.id);
             setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
-            notify(`New message from ${lastMessage.sender}`, 'info');
-            setChatVisible(true); // Ensure chat is set to visible
+            if (lastMessage.sender) {
+              notify(`New message from ${lastMessage.sender}`, 'info');
+            }
+            setChatVisible(true);
           }
         }
       } else {
@@ -174,11 +175,10 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
 
   const handleOpenChat = () => {
     setChatVisible(true);
-    setUnreadMessages([]); // Reset unread messages when chat is opened
+    setUnreadMessages([]);
   };
 
-  // Calculate right position based on chat window index
-  const rightPosition = 20 + (position * 320); // 320px = width + gap
+  const rightPosition = 20 + (position * 320); 
 
   return (
     <>

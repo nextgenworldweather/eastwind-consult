@@ -108,7 +108,13 @@ const ChatRoom = ({ username }) => {
           const lastMessage = transformedMessages[transformedMessages.length - 1];
           if (lastMessage && lastMessage.sender !== username) {
             setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
-            notify(`New message from ${lastMessage.sender}`, 'info');
+            
+    if (lastMessage && lastMessage.sender) {
+        notify(`New message from ${lastMessage.sender}`, 'info');
+    } else {
+        console.warn('Notification skipped: sender undefined');
+    }
+    , 'info');
           }
         }, (error) => {
           console.error('Messages listener error:', error);
