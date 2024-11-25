@@ -68,7 +68,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
         <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
           <Smile className="h-4 w-4" />
         </Button>
@@ -183,7 +183,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   return (
     <>
       <Card 
-        className={`fixed bottom-20 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
+        className={`fixed bottom-80 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
         style={{ right: `${rightPosition}px` }}
       >
         <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
@@ -224,7 +224,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
         <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
       </Card>
 
-      <Button onClick={handleOpenChat} className="fixed bottom-10 right-10 bg-blue-500 text-white p-2 rounded">
+      <Button onClick={handleOpenChat} className="fixed bottom-80 right-10 bg-blue-500 text-white p-2 rounded">
         Open Chat with {targetUser}
       </Button>
 

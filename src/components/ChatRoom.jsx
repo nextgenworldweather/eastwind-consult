@@ -207,7 +207,7 @@ const ChatRoom = ({ username }) => {
             onSendMessage={sendMessage} 
             currentUser={username}
             chatId="chatroom"
-            toggleVideo={toggleVideo} // Pass the toggleVideo function here
+            toggleVideo={toggleVideo}
           />
         </div>
       </div>
@@ -216,6 +216,7 @@ const ChatRoom = ({ username }) => {
         <MemoizedVideoConference 
           username={username} 
           onError={(err) => setError(err.message)}
+          className="video-conference-container"
         />
       )}
 
