@@ -37,6 +37,7 @@ export function Notification({
       closeOnClick={closeOnClick}
       pauseOnHover={pauseOnHover}
       draggable={draggable}
+      closeButton
       className={`${positions[position]} ${className}`}
       toastClassName={({ type = 'default' }) => 
         `relative flex p-4 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer 

@@ -5,7 +5,8 @@ import VideoConference from './VideoConference';
 import MessageInput from './MessageInput';
 import PrivateChat from './PrivateChat';
 import { db } from '../utils/firebase';
-import { ref, onValue, push, set, serverTimestamp, off } from 'firebase/database';
+import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
+import Notification, { notify } from './Notification';
 import '../styles/components/ChatRoom.css';
 
 // Constants for Firebase paths
@@ -26,6 +27,7 @@ const ChatRoom = ({ username }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [privateChats, setPrivateChats] = useState(new Map());
+  const [unreadMessages, setUnreadMessages] = useState([]);
 
   // Transform messages data
   const transformMessages = useCallback((messagesData) => {
@@ -98,8 +100,16 @@ const ChatRoom = ({ username }) => {
     const setupListeners = async () => {
       try {
         onValue(messagesRef, (snapshot) => {
-          setMessages(transformMessages(snapshot.val()));
+          const transformedMessages = transformMessages(snapshot.val());
+          setMessages(transformedMessages);
           setIsLoading(false);
+
+          // Update unread messages
+          const lastMessage = transformedMessages[transformedMessages.length - 1];
+          if (lastMessage && lastMessage.sender !== username) {
+            setUnreadMessages((prevMessages) => [...prevMessages, lastMessage.id]);
+            notify(`New message from ${lastMessage.sender}`, 'info');
+          }
         }, (error) => {
           console.error('Messages listener error:', error);
           setError('Failed to load messages');
@@ -137,13 +147,14 @@ const ChatRoom = ({ username }) => {
   }, [username, transformMessages, transformUsers, handleUserPresence]);
 
   // Send message handler
-  const sendMessage = useCallback(async (text) => {
+  const sendMessage = useCallback(async (text, type = 'text') => {
     if (!text.trim()) return;
 
     try {
       const messagesRef = ref(db, FIREBASE_PATHS.MESSAGES);
       await push(messagesRef, {
         text: text.trim(),
+        type,
         username,
         timestamp: serverTimestamp(),
       });
@@ -183,10 +194,12 @@ const ChatRoom = ({ username }) => {
           <MemoizedMessageList 
             messages={messages} 
             currentUser={username}
+            unreadMessages={unreadMessages}
           />
           <MessageInput 
             onSendMessage={sendMessage} 
-            disabled={!username}
+            currentUser={username}
+            chatId="chatroom"
           />
         </div>
       </div>
@@ -218,6 +231,7 @@ const ChatRoom = ({ username }) => {
           />
         )
       ))}
+      <Notification />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-// MessageWithAvatar.jsx
 import React from 'react';
 import Avatar from 'react-avatar';
 import moment from 'moment';
