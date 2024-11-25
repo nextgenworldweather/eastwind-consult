@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { db, storage } from '../utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
@@ -39,11 +38,9 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     }
   };
 
-  const handleEmojiClick = (event, emojiObject) => {
-    const emoji = emojiObject.emoji || emojiObject.native || event.target.innerText;
-    if (emoji) {
-      setMessage((prevMessage) => prevMessage + emoji);
-    }
+  const handleEmojiClick = (emojiData) => {
+    const emoji = emojiData.emoji;
+    setMessage((prevMessage) => prevMessage + emoji);
     setShowEmojiPicker(false);
   };
 
@@ -56,7 +53,9 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
           onSendMessage({
             text: file.name,
             fileUrl: url,
-            type: 'file'
+            type: 'file',
+            fileSize: file.size,
+            fileType: file.type
           });
         }).catch((error) => {
           console.error('Error getting download URL:', error);
@@ -137,7 +136,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
             if (lastMessage.sender) {
               notify(`New message from ${lastMessage.sender}`, 'info');
             }
-            setChatVisible(true);
+            setChatVisible(true); // Ensure chat is set to visible
           }
         }
       } else {
@@ -175,10 +174,11 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
 
   const handleOpenChat = () => {
     setChatVisible(true);
-    setUnreadMessages([]);
+    setUnreadMessages([]); // Reset unread messages when chat is opened
   };
 
-  const rightPosition = 20 + (position * 320); 
+  // Calculate right position based on chat window index
+  const rightPosition = 20 + (position * 320); // 320px = width + gap
 
   return (
     <>

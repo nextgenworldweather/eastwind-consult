@@ -1,38 +1,52 @@
+.user-list-container {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
 .user-list {
-  width: 200px;
-  background: white;
-  border-right: 1px solid #eee;
-  padding: 20px;
+  margin-bottom: 10px;
 }
 
 .user-list h3 {
-  color: var(--primary-blue);
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
-.users {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.user-list ul {
+  list-style: none;
+  padding: 0;
 }
 
-.user-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.user-list li {
   padding: 8px;
-  border-radius: 4px;
-  background: #f8f9fa;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-list li.current-user {
+  font-weight: bold;
+  color: blue;
+}
+
+.user-list li:hover {
+  background-color: #f0f0f0;
 }
 
 .user-status-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary-green);
+  margin-right: 8px;
 }
 
-.user-name {
-  font-size: 14px;
-  color: var(--text-primary);
+.private-chat-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.private-chat-btn:hover {
+  background-color: #0056b3;
 }
