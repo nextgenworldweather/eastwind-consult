@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ref, set } from 'firebase/database';
+import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../utils/firebase';
 import EmojiPicker from 'emoji-picker-react';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
@@ -45,16 +47,20 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const fileUrl = reader.result;
-        onSendMessage({
-          text: file.name,
-          fileUrl,
-          type: 'file'
+      const storageReference = storageRef(storage, `uploads/${file.name}`);
+      uploadBytes(storageReference, file).then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((url) => {
+          onSendMessage({
+            text: file.name,
+            fileUrl: url,
+            type: 'file'
+          });
+        }).catch((error) => {
+          console.error('Error getting download URL:', error);
         });
-      };
-      reader.readAsDataURL(file);
+      }).catch((error) => {
+        console.error('Error uploading file:', error);
+      });
     }
   };
 
