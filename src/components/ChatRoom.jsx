@@ -8,7 +8,7 @@ import { db } from '../utils/firebase';
 import { ref, onValue, push, set, serverTimestamp, off, query, orderByChild } from 'firebase/database';
 import Notification, { notify } from './Notification';
 import { Video } from 'lucide-react';
-import Button from '/src/components/ui/button'; // Ensure Button is imported
+import Button from '/src/components/ui/button';
 import '../styles/components/ChatRoom.css';
 
 // Constants for Firebase paths
@@ -217,13 +217,6 @@ const ChatRoom = ({ username }) => {
           onError={(err) => setError(err.message)}
         />
       )}
-
-      {/* Move the show video button to the left side of the emoji button */}
-      <div style={{ position: 'relative', display: 'inline-block', marginRight: '8px' }}>
-        <Button type="button" size="icon" onClick={toggleVideo}>
-          <Video className="h-4 w-4" />
-        </Button>
-      </div>
 
       <Notification />
     </div>

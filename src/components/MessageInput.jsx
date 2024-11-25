@@ -5,9 +5,9 @@ import { db, storage } from '../utils/firebase';
 import EmojiPicker from 'emoji-picker-react';
 import Button from '/src/components/ui/button';
 import Input from '/src/components/ui/input';
-import { Send, Paperclip, Smile } from 'lucide-react';
+import { Send, Paperclip, Smile, Video } from 'lucide-react';
 
-const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
+const MessageInput = ({ onSendMessage, currentUser, chatId, toggleVideo }) => {
   const [message, setMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -64,7 +64,10 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
+        <Button type="button" size="icon" onClick={toggleVideo}>
+          <Video className="h-4 w-4" />
+        </Button>
         <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
           <Smile className="h-4 w-4" />
         </Button>
