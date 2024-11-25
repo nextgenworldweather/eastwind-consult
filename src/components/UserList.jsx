@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PrivateChat from './PrivateChat';
-import '../styles/components/UserList.css';
+import '/src/styles/components/UserList.css';
 
 const UserList = ({ users, currentUser }) => {
   const [selectedUser, setSelectedUser] = useState(null);
