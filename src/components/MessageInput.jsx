@@ -14,21 +14,21 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     setMessage(e.target.value);
     if (!isTyping) {
       setIsTyping(true);
-      set(ref(db, `chatrooms/${chatId}/typing/${currentUser}`), true);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), true);
     }
     if (e.target.value === '') {
       setIsTyping(false);
-      set(ref(db, `chatrooms/${chatId}/typing/${currentUser}`), false);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (message.trim()) {
-      onSendMessage(message.trim(), 'text');
+      onSendMessage(message.trim());
       setMessage('');
       setIsTyping(false);
-      set(ref(db, `chatrooms/${chatId}/typing/${currentUser}`), false);
+      set(ref(db, `privateChats/${chatId}/typing/${currentUser}`), false);
     }
   };
 
@@ -47,7 +47,12 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        onSendMessage(reader.result, 'file', file.name);
+        const fileUrl = reader.result;
+        onSendMessage({
+          text: file.name,
+          fileUrl,
+          type: 'file'
+        });
       };
       reader.readAsDataURL(file);
     }
