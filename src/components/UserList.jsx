@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
 import PrivateChat from './PrivateChat';
-import '/src/styles/components/UserList.css';
-
-import React, { useState } from 'react';
-import PrivateChat from './PrivateChat';
 import '../styles/components/UserList.css';
 
 const UserList = ({ users, currentUser }) => {
