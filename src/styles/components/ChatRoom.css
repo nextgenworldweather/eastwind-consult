@@ -170,7 +170,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 0px; /* Remove space to ensure tight fit */
+  margin-bottom: 0; /* Close space to ensure tight fit */
 }
 
 .message-item {
@@ -291,27 +291,10 @@
   cursor: not-allowed;
 }
 
-/* Video Conference Toggle */
-.video-toggle-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 14px 28px;
-  background: var(--gradient-blue);
-  color: var(--text-light);
-  border: none;
-  border-radius: 30px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition-normal);
-  z-index: 100;
-}
-
-/* Adjustments for Video Conference UI */
+/* Video Conference UI */
 .video-conference-container {
   position: fixed;
-  bottom: 10px; /* Lower left corner adjustment */
+  bottom: 20px; /* Lower left corner adjustment */
   left: 10px;
   width: 300px; /* Reduced width */
   height: 400px; /* Increased height */
@@ -324,13 +307,13 @@
   transition: var(--transition-normal);
 }
 
-/* Adjustments for Private Chat UI */
+/* Private Chat UI */
 .private-chat-container {
   position: fixed;
-  bottom: 80px; /* Adjusted to be above the message input section */
+  bottom: 0; /* Align with bottom of notice board */
   right: 20px;
-  width: 300px; /* Adjust width if needed */
-  height: 400px; /* Adjust height if needed */
+  width: 320px; /* Adjust width if needed */
+  height: 450px; /* Increased height */
   z-index: 1000;
   background: white;
   border: 2px solid var(--primary-blue);
@@ -340,13 +323,97 @@
   transition: var(--transition-normal);
 }
 
-/* Close space between notice board and message input section */
-.message-list {
-  flex: 1;
-  padding: 20px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 0; /* Close space to ensure tight fit */
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chat-room {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .chat-container {
+    flex-direction: column;
+    gap: 10px;
+    height: calc(100vh - 20px); /* Account for smaller padding */
+  }
+
+  .user-list {
+    width: 100%;
+    max-height: 120px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    max-height: calc(100vh - 140px); /* Adjust based on user list height */
+  }
+
+  .message-list {
+    margin-bottom: 60px; /* Space for input area */
+  }
+
+  .chat-input-container {
+    padding: 10px;
+  }
+
+  .video-conference-container {
+    width: 90%; /* Full width for mobile */
+    height: 60%; /* Adjust height for mobile */
+    bottom: 80px; /* Adjust to avoid overlap */
+    left: 5%;
+  }
+
+  .private-chat-container {
+    width: 90%; /* Full width for mobile */
+    height: 60%; /* Adjust height for mobile */
+    bottom: 80px; /* Adjust to avoid overlap */
+    right: 5%;
+  }
+}
+
+/* Scrollbar Styling */
+.chat-main::-webkit-scrollbar,
+.user-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-main::-webkit-scrollbar-track,
+.user-list::-webkit-scrollbar-track {
+  background: var(--background-light);
+}
+
+.chat-main::-webkit-scrollbar-thumb,
+.user-list::-webkit-scrollbar-thumb {
+  background: var(--primary-blue);
+  border-radius: 4px;
+  transition: var(--transition-normal);
+}
+
+.chat-main::-webkit-scrollbar-thumb:hover,
+.user-list::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-green);
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }

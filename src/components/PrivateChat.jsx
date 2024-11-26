@@ -183,7 +183,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
   return (
     <>
       <Card 
-        className={`fixed bottom-80 w-[300px] h-[400px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
+        className={`fixed bottom-0 w-[320px] h-[450px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
         style={{ right: `${rightPosition}px` }}
       >
         <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
