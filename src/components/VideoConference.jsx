@@ -126,7 +126,7 @@ const VideoConference = ({ username }) => {
     <>
       <Draggable>
         <div className="video-conference-container" style={{ zIndex: 1010 }}>
-          <div className="video-conference">
+          <div className="video-conference" style={{ width: '100%', height: '100%' }}>
             <div className="room-controls">
               <select
                 value={roomId}
