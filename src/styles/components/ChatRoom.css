@@ -170,7 +170,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-bottom: 80px; /* Make space for input area */
+  margin-bottom: 0px; /* Remove space to ensure tight fit */
 }
 
 .message-item {
@@ -218,7 +218,7 @@
 
 /* Chat Input Area */
 .chat-input-container {
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 0;
   right: 0;
@@ -306,90 +306,47 @@
   box-shadow: var(--shadow-lg);
   transition: var(--transition-normal);
   z-index: 100;
-  /* Adjust position to not overlap with chat input */
-  transform: translateY(-70px);
 }
 
-.video-toggle-btn:hover {
-  background: var(--gradient-green);
-  transform: translateY(-2px);
-}
-
-.video-toggle-btn:active {
-  transform: translateY(1px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .chat-room {
-    padding: 10px;
-  }
-
-  .chat-container {
-    flex-direction: column;
-    height: calc(100vh - 20px); /* Account for smaller padding */
-  }
-
-  .user-list {
-    width: 100%;
-    max-height: 120px;
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  .message-list {
-    margin-bottom: 100px; /* More space for input on mobile */
-  }
-
-  .video-toggle-btn {
-    padding: 12px 20px;
-    font-size: 14px;
-    bottom: 16px;
-    right: 16px;
-    transform: translateY(-90px); /* Adjust for mobile layout */
-  }
-}
-
-/* Scrollbar Styling */
-.chat-main::-webkit-scrollbar,
-.user-list::-webkit-scrollbar {
-  width: 8px;
-}
-
-.chat-main::-webkit-scrollbar-track,
-.user-list::-webkit-scrollbar-track {
-  background: var(--background-light);
-}
-
-.chat-main::-webkit-scrollbar-thumb,
-.user-list::-webkit-scrollbar-thumb {
-  background: var(--primary-blue);
-  border-radius: 4px;
+/* Adjustments for Video Conference UI */
+.video-conference-container {
+  position: fixed;
+  bottom: 10px; /* Lower left corner adjustment */
+  left: 10px;
+  width: 300px; /* Reduced width */
+  height: 400px; /* Increased height */
+  z-index: 1000;
+  background: white;
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
   transition: var(--transition-normal);
 }
 
-.chat-main::-webkit-scrollbar-thumb:hover,
-.user-list::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-green);
+/* Adjustments for Private Chat UI */
+.private-chat-container {
+  position: fixed;
+  bottom: 80px; /* Adjusted to be above the message input section */
+  right: 20px;
+  width: 300px; /* Adjust width if needed */
+  height: 400px; /* Adjust height if needed */
+  z-index: 1000;
+  background: white;
+  border: 2px solid var(--primary-blue);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: var(--transition-normal);
 }
 
-/* Animations */
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* Close space between notice board and message input section */
+.message-list {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 0; /* Close space to ensure tight fit */
 }
