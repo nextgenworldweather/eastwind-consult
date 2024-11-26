@@ -10,7 +10,7 @@ import { X, Send, Paperclip, Smile } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
 import EmojiPicker from 'emoji-picker-react';
-import { List, arrayMove } from 'react-moveable';
+import { List, arrayMove } from 'react-movable';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');

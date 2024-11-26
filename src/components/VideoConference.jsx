@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPeer } from '../utils/peerService';
 import { db } from '../utils/firebase';
 import { ref, onValue, set, remove } from 'firebase/database';
-import { List, arrayMove } from 'react-moveable';
+import { List, arrayMove } from 'react-movable';
 import '../styles/components/VideoConference.css';
 
 const VideoConference = ({ username }) => {
