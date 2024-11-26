@@ -125,7 +125,7 @@ const VideoConference = ({ username }) => {
   return (
     <>
       <Draggable>
-        <div className="video-conference-container" style={{ zIndex: 1010, width: '100%', height: '100%' }}>
+        <div className="video-conference-container" style={{ zIndex: 1010 }}>
           <div className="video-conference">
             <div className="room-controls">
               <select
@@ -140,7 +140,7 @@ const VideoConference = ({ username }) => {
               </select>
               <span className="room-info">Current Room: {roomId}</span>
             </div>
-            <div className="video-grid">
+            <div className="video-grid" style={{ width: '100%', height: '100%' }}>
               <div className="video-container local" style={{ width: '100%', height: '100%' }}>
                 <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%' }} />
                 <div className="video-label">You ({username})</div>
