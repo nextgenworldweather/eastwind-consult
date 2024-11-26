@@ -221,7 +221,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
           </ScrollArea>
 
           <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
-        </div>
+          </div>
       </Draggable>
 
       <Button onClick={handleOpenChat} className="fixed bottom-80 right-10 bg-blue-500 text-white p-2 rounded">
