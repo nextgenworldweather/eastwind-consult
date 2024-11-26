@@ -26,7 +26,7 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install 
 
-          npm install clsx tailwind-merge core-js core-js-pure moment is-retina charenc is-buffer emoji-mart --save
+          npm install clsx react-draggable tailwind-merge core-js core-js-pure moment is-retina charenc is-buffer emoji-mart --save
           
           # Install dev dependencies explicitly
           npm install -D @vitejs/plugin-react vite @types/react @types/react-dom gh-pages tailwindcss @tailwindcss/forms autoprefixer postcss mocha webpack

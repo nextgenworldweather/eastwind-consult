@@ -1,3 +1,4 @@
+import Draggable from 'react-draggable';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPeer } from '../utils/peerService';
 import { db } from '../utils/firebase';
@@ -17,13 +18,13 @@ const VideoConference = ({ username }) => {
   useEffect(() => {
     const initPeer = async () => {
       const newPeer = createPeer();
-      
+
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true
         });
-        
+
         streamRef.current = stream;
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
@@ -54,7 +55,7 @@ const VideoConference = ({ username }) => {
         onValue(roomRef, (snapshot) => {
           const peersData = snapshot.val() || {};
           setPeers(peersData);
-          
+
           // Call new peers
           Object.entries(peersData).forEach(([peerUsername, peerData]) => {
             if (peerUsername !== username && !calls.find(c => c.peer === peerData.peerId)) {
@@ -84,9 +85,9 @@ const VideoConference = ({ username }) => {
       setCalls(prev => {
         // Remove any existing call with the same peer
         const filtered = prev.filter(c => c.peer !== call.peer);
-        return [...filtered, { 
-          call, 
-          stream: remoteStream, 
+        return [...filtered, {
+          call,
+          stream: remoteStream,
           peer: call.peer,
           username: peerUsername
         }];
@@ -122,47 +123,51 @@ const VideoConference = ({ username }) => {
   };
 
   return (
-    <div className="video-conference">
-      <div className="room-controls">
-        <select 
-          value={roomId} 
-          onChange={(e) => joinRoom(e.target.value)}
-          className="room-selector"
-        >
-          <option value="main">Main Room</option>
-          <option value="room1">Room 1</option>
-          <option value="room2">Room 2</option>
-          <option value="room3">Room 3</option>
-        </select>
-        <span className="room-info">Current Room: {roomId}</span>
-      </div>
-      <div className="video-grid">
-        <div className="video-container local">
-          <video ref={localVideoRef} autoPlay muted playsInline />
-          <div className="video-label">You ({username})</div>
-          <div className="video-controls">
-            <button onClick={toggleVideo} className={`control-btn ${!videoEnabled ? 'disabled' : ''}`}>
-              {videoEnabled ? '🎥' : '❌'}
-            </button>
-            <button onClick={toggleAudio} className={`control-btn ${!audioEnabled ? 'disabled' : ''}`}>
-              {audioEnabled ? '🎤' : '🔇'}
-            </button>
+    <Draggable>
+      <div>
+        <div className="video-conference">
+          <div className="room-controls">
+            <select
+              value={roomId}
+              onChange={(e) => joinRoom(e.target.value)}
+              className="room-selector"
+            >
+              <option value="main">Main Room</option>
+              <option value="room1">Room 1</option>
+              <option value="room2">Room 2</option>
+              <option value="room3">Room 3</option>
+            </select>
+            <span className="room-info">Current Room: {roomId}</span>
+          </div>
+          <div className="video-grid">
+            <div className="video-container local">
+              <video ref={localVideoRef} autoPlay muted playsInline />
+              <div className="video-label">You ({username})</div>
+              <div className="video-controls">
+                <button onClick={toggleVideo} className={`control-btn ${!videoEnabled ? 'disabled' : ''}`}>
+                  {videoEnabled ? '🎥' : '❌'}
+                </button>
+                <button onClick={toggleAudio} className={`control-btn ${!audioEnabled ? 'disabled' : ''}`}>
+                  {audioEnabled ? '🎤' : '🔇'}
+                </button>
+              </div>
+            </div>
+            {calls.map((call, index) => (
+              <div key={index} className="video-container remote">
+                <video
+                  autoPlay
+                  playsInline
+                  ref={video => {
+                    if (video) video.srcObject = call.stream;
+                  }}
+                />
+                <div className="video-label">{call.username}</div>
+              </div>
+            ))}
           </div>
         </div>
-        {calls.map((call, index) => (
-          <div key={index} className="video-container remote">
-            <video
-              autoPlay
-              playsInline
-              ref={video => {
-                if (video) video.srcObject = call.stream;
-              }}
-            />
-            <div className="video-label">{call.username}</div>
-          </div>
-        ))}
       </div>
-    </div>
+    </Draggable>
   );
 };
 
