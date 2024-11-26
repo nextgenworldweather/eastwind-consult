@@ -1,5 +1,4 @@
-import Draggable from 'react-draggable';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, storage } from '../utils/firebase';
 import { ref, onValue, push, set, query, orderByChild, serverTimestamp } from 'firebase/database';
 import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -11,6 +10,7 @@ import { X, Send, Paperclip, Smile } from 'lucide-react';
 import Notification, { notify } from '/src/components/Notification';
 import MessageWithAvatar from '/src/components/MessageWithAvatar';
 import EmojiPicker from 'emoji-picker-react';
+import Moveable from 'react-moveable';
 
 const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   const [message, setMessage] = useState('');
@@ -101,13 +101,19 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   );
 };
 
-const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
+const PrivateChat = ({ currentUser, targetUser, onClose }) => {
   const [messages, setMessages] = useState([]);
   const [chatId, setChatId] = useState(null);
   const [chatVisible, setChatVisible] = useState(false);
   const [lastMessageId, setLastMessageId] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const privateChatRef = useRef();
+  const [frame, setFrame] = useState({
+    translate: [0, 0],
+    width: 320,
+    height: 450
+  });
 
   useEffect(() => {
     const users = [currentUser, targetUser].sort();
@@ -178,61 +184,87 @@ const PrivateChat = ({ currentUser, targetUser, onClose, position = 0 }) => {
     setUnreadMessages([]); // Reset unread messages when chat is opened
   };
 
-  // Calculate right position based on chat window index
-  const rightPosition = 20 + (position * 320); // 320px = width + gap
-
   return (
-    <Draggable>
-      <div>
-        <Card 
-          className={`fixed bottom-0 w-[320px] h-[450px] flex flex-col shadow-lg border-2 border-blue-500 z-50 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
-          style={{ right: `${rightPosition}px` }}
-        >
-          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <h3 className="font-medium truncate">
-              Chat with {targetUser} 
-              {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
-            </h3>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-white hover:bg-blue-400/20"
-              onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
-            >
-              <X className="h-4 w-4" />
-            </Button>
+    <>
+      <div
+        ref={privateChatRef}
+        className={`fixed flex flex-col shadow-lg border-2 border-blue-500 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`}
+        style={{
+          width: frame.width,
+          height: frame.height,
+          transform: `translate(${frame.translate[0]}px, ${frame.translate[1]}px)`,
+          zIndex: 1010
+        }}
+      >
+        <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <h3 className="font-medium truncate">
+            Chat with {targetUser} 
+            {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
+          </h3>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-white hover:bg-blue-400/20"
+            onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <ScrollArea className="flex-1 p-4">
+          <div className="space-y-4">
+            {messages.map((message) => {
+              const isSender = message.sender === currentUser;
+              return (
+                <MessageWithAvatar 
+                  key={message.id}
+                  message={message}
+                  isSender={isSender}
+                />
+              );
+            })}
+            {isTyping && (
+              <div className="typingIndicator">
+                {`${targetUser} is typing...`}
+              </div>
+            )}
           </div>
+        </ScrollArea>
 
-          <ScrollArea className="flex-1 p-4">
-            <div className="space-y-4">
-              {messages.map((message) => {
-                const isSender = message.sender === currentUser;
-                return (
-                  <MessageWithAvatar 
-                    key={message.id}
-                    message={message}
-                    isSender={isSender}
-                  />
-                );
-              })}
-              {isTyping && (
-                <div className="typingIndicator">
-                  {`${targetUser} is typing...`}
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-
-          <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
-        </Card>
-
-        <Button onClick={handleOpenChat} className="fixed bottom-80 right-10 bg-blue-500 text-white p-2 rounded">
-          Open Chat with {targetUser}
-        </Button>
-
-        <Notification />
+        <MessageInput onSendMessage={sendPrivateMessage} currentUser={currentUser} chatId={chatId} />
       </div>
-    </Draggable>
+
+      <Moveable
+        target={privateChatRef.current}
+        draggable={true}
+        resizable={true}
+        throttleResize={0}
+        onDrag={({ target, left, top }) => {
+          target.style.transform = `translate(${left}px, ${top}px)`;
+          setFrame({
+            ...frame,
+            translate: [left, top]
+          });
+        }}
+        onResize={({ target, width, height, delta }) => {
+          const beforeTranslate = delta.beforeTranslate;
+          target.style.width = `${width}px`;
+          target.style.height = `${height}px`;
+          setFrame({
+            ...frame,
+            translate: [
+              frame.translate[0] + beforeTranslate[0],
+              frame.translate[1] + beforeTranslate[1]
+            ],
+            width,
+            height
+          });
+        }}
+        keepRatio={false}
+        renderDirections={["nw", "ne", "sw", "se", "n", "w", "e", "s"]}
+        edge={false}
+      />
+    </>
   );
 };
 

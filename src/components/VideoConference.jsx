@@ -1,8 +1,8 @@
-import Draggable from 'react-draggable';
 import React, { useEffect, useRef, useState } from 'react';
 import { createPeer } from '../utils/peerService';
 import { db } from '../utils/firebase';
 import { ref, onValue, set, remove } from 'firebase/database';
+import Moveable from 'react-moveable';
 import '../styles/components/VideoConference.css';
 
 const VideoConference = ({ username }) => {
@@ -14,6 +14,12 @@ const VideoConference = ({ username }) => {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [roomId, setRoomId] = useState('main');
   const streamRef = useRef(null);
+  const videoConferenceRef = useRef();
+  const [frame, setFrame] = useState({
+    translate: [0, 0],
+    width: 300,
+    height: 400
+  });
 
   useEffect(() => {
     const initPeer = async () => {
@@ -123,8 +129,17 @@ const VideoConference = ({ username }) => {
   };
 
   return (
-    <Draggable>
-      <div>
+    <>
+      <div
+        ref={videoConferenceRef}
+        className="video-conference-container"
+        style={{
+          width: frame.width,
+          height: frame.height,
+          transform: `translate(${frame.translate[0]}px, ${frame.translate[1]}px)`,
+          zIndex: 1010
+        }}
+      >
         <div className="video-conference">
           <div className="room-controls">
             <select
@@ -167,7 +182,38 @@ const VideoConference = ({ username }) => {
           </div>
         </div>
       </div>
-    </Draggable>
+
+      <Moveable
+        target={videoConferenceRef.current}
+        draggable={true}
+        resizable={true}
+        throttleResize={0}
+        onDrag={({ target, left, top }) => {
+          target.style.transform = `translate(${left}px, ${top}px)`;
+          setFrame({
+            ...frame,
+            translate: [left, top]
+          });
+        }}
+        onResize={({ target, width, height, delta }) => {
+          const beforeTranslate = delta.beforeTranslate;
+          target.style.width = `${width}px`;
+          target.style.height = `${height}px`;
+          setFrame({
+            ...frame,
+            translate: [
+              frame.translate[0] + beforeTranslate[0],
+              frame.translate[1] + beforeTranslate[1]
+            ],
+            width,
+            height
+          });
+        }}
+        keepRatio={false}
+        renderDirections={["nw", "ne", "sw", "se", "n", "w", "e", "s"]}
+        edge={false}
+      />
+    </>
   );
 };
 
