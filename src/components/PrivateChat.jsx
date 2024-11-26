@@ -68,7 +68,7 @@ const MessageInput = ({ onSendMessage, currentUser, chatId }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t">
+    <form onSubmit={handleSubmit} className="flex gap-2 p-4 border-t private-chat-footer">
       <div style={{ position: 'relative', display: 'flex', gap: '8px' }}>
         <Button type="button" size="icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
           <Smile className="h-4 w-4" />
@@ -184,8 +184,8 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
       <Draggable
         defaultPosition={{ x: window.innerWidth - 350, y: window.innerHeight - 500 }}
       >
-        <div ref={privateChatRef} className={`fixed w-[320px] h-[450px] flex flex-col shadow-lg border-2 border-blue-500 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`} style={{ zIndex: 1010 }}>
-          <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+        <div ref={privateChatRef} className={`private-chat ${chatVisible ? '' : 'hidden'}`} style={{ zIndex: 1010 }}>
+          <div className="private-chat-header">
             <h3 className="font-medium truncate">
               Chat with {targetUser} 
               {unreadMessages.length > 0 && <span className="ml-2 bg-red-500 text-white px-2 py-1 rounded-full">{unreadMessages.length}</span>}
@@ -193,14 +193,13 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-white hover:bg-blue-400/20"
               onClick={() => { onClose(); setChatVisible(false); setUnreadMessages([]); }}
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
 
-          <ScrollArea className="flex-1 p-4">
+          <ScrollArea className="private-chat-messages">
             <div className="space-y-4">
               {messages.map((message) => {
                 const isSender = message.sender === currentUser;
@@ -209,6 +208,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
                     key={message.id}
                     message={message}
                     isSender={isSender}
+                    className={`private-message ${isSender ? 'sent' : 'received'}`}
                   />
                 );
               })}
