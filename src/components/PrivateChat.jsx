@@ -184,7 +184,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
       <Draggable
         defaultPosition={{ x: window.innerWidth - 350, y: window.innerHeight - 500 }}
       >
-        <div ref={privateChatRef} className={`fixed bottom-0 right-0 w-[320px] h-[450px] flex flex-col shadow-lg border-2 border-blue-500 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`} style={{ zIndex: 1010 }}>
+        <div ref={privateChatRef} className={`fixed w-[320px] h-[450px] flex flex-col shadow-lg border-2 border-blue-500 bg-white rounded-lg overflow-hidden ${chatVisible ? '' : 'hidden'}`} style={{ zIndex: 1010 }}>
           <div className="flex items-center justify-between px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white">
             <h3 className="font-medium truncate">
               Chat with {targetUser} 
