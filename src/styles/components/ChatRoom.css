@@ -310,11 +310,11 @@
 /* Private Chat UI */
 .private-chat-container {
   position: fixed;
-  bottom: 0; /* Align with bottom of notice board */
+  bottom: 80px; /* Align with the top border of the message input section */
   right: 20px;
   width: 320px; /* Adjust width if needed */
-  height: 450px; /* Increased height */
-  z-index: 1000;
+  height: 450px; /* Adjust height */
+  z-index: 1010; /* Increase z-index to stay above other elements */
   background: white;
   border: 2px solid var(--primary-blue);
   border-radius: var(--radius-lg);
