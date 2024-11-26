@@ -141,8 +141,8 @@ const VideoConference = ({ username }) => {
               <span className="room-info">Current Room: {roomId}</span>
             </div>
             <div className="video-grid">
-              <div className="video-container local">
-                <video ref={localVideoRef} autoPlay muted playsInline />
+              <div className="video-container local" style={{ width: '100%', height: '100%' }}>
+                <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%' }} />
                 <div className="video-label">You ({username})</div>
                 <div className="video-controls">
                   <button onClick={toggleVideo} className={`control-btn ${!videoEnabled ? 'disabled' : ''}`}>
@@ -154,13 +154,14 @@ const VideoConference = ({ username }) => {
                 </div>
               </div>
               {calls.map((call, index) => (
-                <div key={index} className="video-container remote">
+                <div key={index} className="video-container remote" style={{ width: '100%', height: '100%' }}>
                   <video
                     autoPlay
                     playsInline
                     ref={video => {
                       if (video) video.srcObject = call.stream;
                     }}
+                    style={{ width: '100%', height: '100%' }}
                   />
                   <div className="video-label">{call.username}</div>
                 </div>
