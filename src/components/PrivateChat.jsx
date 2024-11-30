@@ -181,9 +181,7 @@ const PrivateChat = ({ currentUser, targetUser, onClose }) => {
 
   return (
     <>
-      <Draggable
-        defaultPosition={{ x: window.innerWidth - 350, y: window.innerHeight - 500 }}
-      >
+      <Draggable>
         <div ref={privateChatRef} className={`private-chat ${chatVisible ? '' : 'hidden'}`} style={{ zIndex: 1010 }}>
           <div className="private-chat-header">
             <h3 className="font-medium truncate">
