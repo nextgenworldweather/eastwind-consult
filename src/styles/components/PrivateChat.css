@@ -8,6 +8,7 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   display: flex;
+  background-image: url("/src/assets/private-chat-background.jpg");
   flex-direction: column;
   z-index: 1011;
   border: 2px solid var(--primary-blue);
