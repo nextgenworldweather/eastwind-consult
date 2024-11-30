@@ -1,12 +1,13 @@
 .video-conference-container {
-  display: flex;
+  /* display: flex; */
   right: 20px;
   width: 30px;
+  object-fit: fill;
   background:#0055ff;
 }
 
 .video-conference {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   position: fixed;
   background: #f0f8ff; /* Light blue tint background */
   border-radius: 10px;
