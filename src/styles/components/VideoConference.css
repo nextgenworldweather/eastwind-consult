@@ -1,19 +1,13 @@
-.video-conference-container {
-  display: flex;
-  right: 20px;
-  width: 300px;
-  height: 400px;
-  background:#0055ff;
-}
-
 .video-conference {
-  flex-grow: 1;
   position: fixed;
+  right: 20px;
+  bottom: 80px;
+  width: 300px;
   background: #f0f8ff; /* Light blue tint background */
   border-radius: 10px;
   box-shadow: 0 6px 12px rgba(0, 83, 255, 0.15);
-  overflow: hidden;
-  z-index: 1011;
+  overflow: auto;
+  z-index: 1000;
   border: 2px solid #0055ff;
   transition: all 0.3s ease;
 }

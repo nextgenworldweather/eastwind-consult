@@ -5,8 +5,6 @@
   width: 300px;
   height: 400px;
   background: white;
-  background-image: url("/src/assets/images/private-chat-background.jpg");
-  background-size: cover;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   display: flex;

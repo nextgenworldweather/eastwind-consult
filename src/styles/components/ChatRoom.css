@@ -171,8 +171,6 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 0; /* Close space to ensure tight fit */
-  background-image: url("/src/assets/images/main-chat-background.jpeg");
-  background-size: cover;
 }
 
 .message-item {
@@ -299,8 +297,8 @@
   bottom: 20px; /* Lower left corner adjustment */
   left: 10px;
   width: 300px; /* Reduced width */
-  height: 450px; /* Increased height */
-  z-index: 1010;
+  height: 400px; /* Increased height */
+  z-index: 1000;
   background: white;
   border: 2px solid var(--primary-blue);
   border-radius: var(--radius-lg);
@@ -314,12 +312,10 @@
   position: fixed;
   bottom: 80px; /* Align with the top border of the message input section */
   right: 20px;
-  width: 30px; /* Adjust width if needed */
-  height: 40px; /* Adjust height */
+  width: 320px; /* Adjust width if needed */
+  height: 450px; /* Adjust height */
   z-index: 1010; /* Increase z-index to stay above other elements */
   background: white;
-  background-image: url("/src/assets/images/private-chat-background.jpg");
-  background-size: cover;
   border: 2px solid var(--primary-blue);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
