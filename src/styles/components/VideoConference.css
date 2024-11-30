@@ -4,6 +4,7 @@
   width: 30px;
   object-fit: fill;
   background:#0055ff;
+  flex-grow: 1;
 }
 
 .video-conference {
