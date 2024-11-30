@@ -2,9 +2,8 @@
   display: flex;
   right: 20px;
   width: 30px;
-  object-fit: fill;
+  height: 400px;
   background:#0055ff;
-  flex-grow: 1;
 }
 
 .video-conference {
