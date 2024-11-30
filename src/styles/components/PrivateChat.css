@@ -2,14 +2,14 @@
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 300px;
-  height: 400px;
+  width: 30px;
+  height: 40px;
   background: white;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
-  z-index: 1000;
+  z-index: 1011;
   border: 2px solid var(--primary-blue);
   /* Position above the video toggle button */
   transform: translateY(-140px);

@@ -171,6 +171,7 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 0; /* Close space to ensure tight fit */
+  background-image: url("/src/assets/chat-background.jpeg");
 }
 
 .message-item {
@@ -296,8 +297,8 @@
   position: fixed;
   bottom: 20px; /* Lower left corner adjustment */
   left: 10px;
-  width: 300px; /* Reduced width */
-  height: 400px; /* Increased height */
+  width: 30px; /* Reduced width */
+  height: 40px; /* Increased height */
   z-index: 1000;
   background: white;
   border: 2px solid var(--primary-blue);
@@ -312,8 +313,8 @@
   position: fixed;
   bottom: 80px; /* Align with the top border of the message input section */
   right: 20px;
-  width: 320px; /* Adjust width if needed */
-  height: 450px; /* Adjust height */
+  width: 30px; /* Adjust width if needed */
+  height: 40px; /* Adjust height */
   z-index: 1010; /* Increase z-index to stay above other elements */
   background: white;
   border: 2px solid var(--primary-blue);
