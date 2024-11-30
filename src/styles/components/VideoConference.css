@@ -1,3 +1,8 @@
+.video-conference-container {
+  right: 20px;
+  width: 30px;
+}
+
 .video-conference {
   position: fixed;
   right: 20px;
