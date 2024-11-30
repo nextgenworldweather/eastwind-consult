@@ -172,7 +172,7 @@
   gap: 12px;
   margin-bottom: 0; /* Close space to ensure tight fit */
   background-image: url("/src/assets/images/main-chat-background.jpeg");
-  background-size: contain;
+  background-size: cover;
 }
 
 .message-item {
@@ -318,6 +318,8 @@
   height: 40px; /* Adjust height */
   z-index: 1010; /* Increase z-index to stay above other elements */
   background: white;
+  background-image: url("/src/assets/images/private-chat-background.jpg");
+  background-size: cover;
   border: 2px solid var(--primary-blue);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
