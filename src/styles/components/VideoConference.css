@@ -1,7 +1,7 @@
 .video-conference {
   position: fixed;
-  right: 1px;
-  bottom: 1px;
+  right: 0px;
+  bottom: 0px;
   width: max-content;
   height: max-content;
   background: #2f6ea8; /* Light blue tint background */
