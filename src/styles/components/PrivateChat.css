@@ -5,12 +5,13 @@
   width: 300px;
   height: 400px;
   background: white;
+  background-image: url("/src/assets/images/private-chat-background.jpg");
+  background-size: cover;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   display: flex;
-  background-image: url("/src/assets/private-chat-background.jpg");
   flex-direction: column;
-  z-index: 1011;
+  z-index: 1000;
   border: 2px solid var(--primary-blue);
   /* Position above the video toggle button */
   transform: translateY(-140px);

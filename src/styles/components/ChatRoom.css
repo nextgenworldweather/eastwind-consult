@@ -171,7 +171,8 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 0; /* Close space to ensure tight fit */
-  background-image: url("/src/assets/main-chat-background.jpeg");
+  background-image: url("/src/assets/images/main-chat-background.jpeg");
+  background-size: contain;
 }
 
 .message-item {
