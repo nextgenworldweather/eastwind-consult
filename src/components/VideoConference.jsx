@@ -142,7 +142,7 @@ const VideoConference = ({ username }) => {
             </div>
             <div className="video-grid" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
               <div className="video-container local" style={{ width: '100%', height: '100%', padding: 0, margin: 0 }}>
-                <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                <video ref={localVideoRef} autoPlay muted playsInline style={{ width: '100%', height: '100%', objectFit: 'fill' }} />
                 <div className="video-label" style={{ position: 'absolute', top: '0', left: '0', padding: '10px', backgroundColor: 'rgba(0,0,0,0.5)', color: '#fff' }}>You ({username})</div>
                 <div className="video-controls" style={{ position: 'absolute', bottom: '10px', left: '10px' }}>
                   <button onClick={toggleVideo} className={`control-btn ${!videoEnabled ? 'disabled' : ''}`}>
