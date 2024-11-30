@@ -297,9 +297,9 @@
   position: fixed;
   bottom: 20px; /* Lower left corner adjustment */
   left: 10px;
-  width: 30px; /* Reduced width */
-  height: 40px; /* Increased height */
-  z-index: 1000;
+  width: 300px; /* Reduced width */
+  height: 450px; /* Increased height */
+  z-index: 1010;
   background: white;
   border: 2px solid var(--primary-blue);
   border-radius: var(--radius-lg);
