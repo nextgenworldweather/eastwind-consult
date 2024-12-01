@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const createPeer = () => {
   return new Peer(uuidv4(), {
-    host: 'your-peerjs-server.com',
+    host: 'https://peerjs.com',
     port: 443,
-    path: '/peerjs',
+    path: '/peerserver',
     secure: true
   });
 };
