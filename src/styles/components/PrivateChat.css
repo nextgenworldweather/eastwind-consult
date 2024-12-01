@@ -97,33 +97,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-.private-chat {
-  position: fixed;
-  right: 20px;
-  bottom: 80px;
-  width: 448px;
-  height: 554px;
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
-  z-index: 1010;
-  border: 2px solid var(--primary-blue);
-}
-
-/* Rest of the existing CSS remains the same */
-
-@media (max-width: 768px) {
-  .private-chat {
-    width: 100%;
-    height: 50vh;
-    right: 0;
-    bottom: 0;
-    z-index: 1010;
-  }
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .private-chat {
